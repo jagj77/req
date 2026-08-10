@@ -1,0 +1,105 @@
+---
+# Global Requirements Configuration
+# This file defines defaults for all requirements engineering workflows
+
+# Default language for requirements generation
+# Valid values: "es" (Español) or "en" (English)
+default_language: "es"
+
+# Language detection strategy
+# "auto" = detect from project_name (accents = Spanish)
+# "explicit" = use default_language unless overridden
+# "prompt" = ask user to select
+language_detection_strategy: "auto"
+
+# Glossary settings
+glossary:
+  # Use a single centralized GLOSSARY.md for all projects
+  centralized: true
+  path: "GLOSSARY.md"
+  # If false, each project gets its own GLOSSARY-{lang}.md
+  # If true, all terms in one GLOSSARY.md (in current language)
+
+# Requirements file settings
+requirements:
+  # Naming pattern: "REQ-NNN" (without language suffix)
+  # Single language per execution, no duplicates
+  naming_pattern: "REQ-{NNN}"
+  # File extension
+  extension: ".md"
+
+# Documentation settings
+documentation:
+  # Generate requirements-summary.md in current language only
+  summary_file: "requirements-summary.md"
+  # Generate requirements-structure.md (project layout)
+  structure_file: "requirements-structure.md"
+
+# Output structure
+# Each project_slug gets its own directory with single-language requirements
+output_structure: |
+  /req/
+  ├── .req-config.yml (this file)
+  ├── GLOSSARY.md (centralized, in configured/detected language)
+  ├── {project_slug}/
+  │   └── requirements-set/
+  │       ├── REQ-001.md (in configured/detected language)
+  │       ├── REQ-002.md
+  │       └── requirements-summary.md (in configured/detected language)
+  └── {another_project_slug}/
+      └── requirements-set/
+          ├── REQ-001.md (in configured/detected language)
+          └── requirements-summary.md
+
+# Language-specific settings
+languages:
+  es:
+    name: "Español"
+    default_encoding: "utf-8"
+    # Example questions (full list in grilling-requirements/SKILL.md)
+    sample_question: "¿Cuál es el mayor problema que resuelve?"
+    
+  en:
+    name: "English"
+    default_encoding: "utf-8"
+    sample_question: "What is the primary problem this solves?"
+
+# Validation settings
+validation:
+  # Minimum quality score for approved requirements
+  minimum_quality_score: 90
+  # Check for glossary term usage in requirements
+  check_glossary_consistency: true
+  # Allow mixing languages within a single project
+  allow_language_mixing: false
+
+# Metadata
+metadata:
+  version: "1.0"
+  last_updated: "2026-08-10"
+  maintained_by: "Requirements Engineering Team"
+
+# Usage examples
+# 
+# EXAMPLE 1: Auto-detect Spanish (project_name has accents)
+# /interview-requirements "Búsqueda Avanzada"
+#   → Detecta: "es"
+#   → Genera: busqueda-avanzada/requirements-set/REQ-001.md (en español)
+#   → GLOSSARY.md actualizado en español
+#
+# EXAMPLE 2: Auto-detect English (project_name without accents)
+# /interview-requirements "Advanced Search"
+#   → Detecta: "en"
+#   → Genera: advanced-search/requirements-set/REQ-001.md (en inglés)
+#   → GLOSSARY.md actualizado en inglés
+#
+# EXAMPLE 3: Override default language
+# /interview-requirements "Payment Integration" language="es"
+#   → Fuerza: "es"
+#   → Genera: payment-integration/requirements-set/REQ-001.md (en español)
+#   → GLOSSARY.md actualizado en español
+#
+# EXAMPLE 4: Use global default (if detection_strategy = "explicit")
+# /interview-requirements "Project Name"
+#   → Usa: default_language ("es")
+#   → Genera: project-name/requirements-set/REQ-001.md (en español)

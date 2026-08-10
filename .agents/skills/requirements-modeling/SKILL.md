@@ -17,15 +17,17 @@ applyTo:
 input_format: |
   Receives from /grilling-requirements (Phase 2) OR /requirements-writer-skill (feedback loop):
   
-  Phase 2 Input (from grilling):
+  Phase 2 Input (from grilling-requirements):
   - project_slug: Directory slug for {project_slug}/requirements-set/
-  - articulated_needs
-  - design_decisions
-  - identified_ambiguities
-  - terminology_introduced
+  - language: "es" or "en" (from grilling-requirements)
+  - articulated_needs (in specified language)
+  - design_decisions (in specified language)
+  - identified_ambiguities (in specified language)
+  - terminology_introduced (in specified language)
   
   Feedback Loop Input (from requirements-writer-skill):
   - project_slug: Directory slug for project-specific directories
+  - language: "es" or "en" (for response language)
   - requirement_id: "REQ-NNN"
   - issue: description of ambiguity
   - required_clarification: what needs clarifying
@@ -33,18 +35,19 @@ input_format: |
 output_structure: |
   Produces for interview-requirements:
   - project_slug: [PROPAGATE FROM INPUT] For downstream consistency
-  - glossary_updates: New/updated terms in GLOSSARY.md (root-level, shared)
-  - requirement_candidates: Array of REQ-NNN candidates
-  - clarifications_provided: (for feedback loops)
+  - language: [PROPAGATE FROM INPUT] "es" or "en" for consistency
+  - glossary_updates: New/updated terms in GLOSSARY.md (root-level, shared, in current language)
+  - requirement_candidates: Array of REQ-NNN.md candidates (single language, no suffix)
+  - clarifications_provided: (for feedback loops, in current language)
   - directory_structure: {project_slug}/ [created if not exists]
   
-  All must be structured and machine-readable.
+  All must be structured and machine-readable, in current language.
 
 file_operations: |
   Create/Update these directories and files:
-  - GLOSSARY.md (root-level, centralized, shared by all projects)
-  - {project_slug}/requirements-set/REQ-NNN.md (each requirement)
-  - {project_slug}/requirements-set/requirements-summary.md (final)
+  - GLOSSARY.md (root-level, centralized, shared by all projects, in current language)
+  - {project_slug}/requirements-set/REQ-NNN.md (each requirement, single language)
+  - {project_slug}/requirements-set/requirements-summary.md (final, in current language)
 
 ---
 

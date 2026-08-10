@@ -17,6 +17,8 @@ protocol:
   wait_for_feedback: true
   explore_codebase: true
   propagate_project_slug: true
+  language_aware: true
+  questions_in: "es (Spanish) or en (English) based on input language parameter"
 
 input_from_orchestrator: |
   Receives from /interview-requirements:
@@ -24,16 +26,18 @@ input_from_orchestrator: |
   - project_slug: Auto-generated directory slug (lowercase, hyphenated)
   - stakeholders: List of stakeholders
   - scope: Project scope
+  - language: "es" or "en" (auto-detected from project_name)
 
 output_structure: |
   Produce structured output containing:
   - project_slug: [PROPAGATE FROM INPUT] For downstream directory use
-  - articulated_needs: Array of needs with stakeholder attribution
-  - design_decisions: Array of decisions with rationale
-  - identified_ambiguities: Terms/concepts that need clarification
-  - terminology_introduced: New terms requiring definition
+  - language: [PROPAGATE FROM INPUT] "es" or "en" for all downstream
+  - articulated_needs: Array of needs with stakeholder attribution (in specified language)
+  - design_decisions: Array of decisions with rationale (in specified language)
+  - identified_ambiguities: Terms/concepts that need clarification (in specified language)
+  - terminology_introduced: New terms requiring definition (in specified language)
   - dependencies_identified: Component/feature interdependencies
-  - open_questions: Unanswered questions and criticality level
+  - open_questions: Unanswered questions and criticality level (in specified language)
   - status: "complete" or "incomplete"
   - ready_for_modeling: true/false
 
@@ -41,8 +45,15 @@ output_structure: |
 
 ## Grilling Session Protocol
 
-Interview the user relentlessly, asking **ONE question at a time**:
+Interview the user relentlessly, asking **ONE question at a time**, **in the specified language**:
 
+**SPANISH (es):**
+1. Start with needs identification
+   - "¿Cuál es el mayor problema que resuelve?"
+   - "¿Quién se beneficia más?"
+   - "¿Con qué frecuencia se necesita?"
+
+**ENGLISH (en):**
 1. Start with needs identification
    - "What is the primary problem this solves?"
    - "Who benefits most?"

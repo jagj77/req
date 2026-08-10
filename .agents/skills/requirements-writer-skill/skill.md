@@ -20,38 +20,41 @@ applyTo:
 input_format: |
   Receives from /requirements-modeling (Phase 3 or feedback loop):
   - project_slug: Directory slug for {project_slug}/requirements-set/ operations
-  - requirement_candidates: Array of REQ-NNN candidates
-  - glossary: Current GLOSSARY.md terms (root-level, centralized)
+  - language: "es" or "en" (for output language)
+  - requirement_candidates: Array of REQ-NNN-{language}.md candidates
+  - glossary: Current GLOSSARY.md terms (root-level, centralized, in specified language)
 
 output_structure: |
   Produces for interview-requirements:
   - project_slug: [PROPAGATE FROM INPUT] For downstream consistency
+  - language: [PROPAGATE FROM INPUT] "es" or "en" for consistency
   - validated_requirements: Approved requirements (score >= 90)
-  - clarification_requests: Requirements scoring < 90 with ambiguities
+  - clarification_requests: Requirements scoring < 90 with ambiguities (in specified language)
   - quality_scores: Score breakdown for each requirement
   - all_requirements_approved: true/false
-  - directory_operations: Read/Write paths using GLOSSARY.md (root) and {project_slug}/
+  - directory_operations: Read/Write paths using GLOSSARY.md (root) and {project_slug}/ (language-tagged files)
   
   All must be structured and machine-readable.
 
 file_operations: |
   Read from:
-  - GLOSSARY.md (root-level, for term validation, centralized)
+  - GLOSSARY.md (root-level, for term validation, centralized, in current language)
   - {project_slug}/requirements-set/REQ-NNN.md (candidate requirements)
   
   Write to:
-  - {project_slug}/requirements-set/REQ-NNN.md (updated with validation score)
+  - {project_slug}/requirements-set/REQ-NNN.md (updated with validation score, in current language)
 
 verification: |
   If score < 90, return clarification_request with:
   - requirement_id
-  - issue (what's wrong)
-  - ambiguity (what's unclear)
-  - question_for_modeling (what to clarify)
+  - issue (what's wrong, in specified language)
+  - ambiguity (what's unclear, in specified language)
+  - question_for_modeling (what to clarify, in specified language)
   - project_slug: [PROPAGATE] For routing
+  - language: [PROPAGATE] For response language
   
   Interview-requirements will invoke requirements-modeling,
-  which will update GLOSSARY.md (root-level), then you'll re-evaluate.
+  which will update GLOSSARY.md (root-level, in specified language), then you'll re-evaluate.
 
 ---
 
