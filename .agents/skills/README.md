@@ -13,7 +13,6 @@ El usuario inicia con `/interview-requirements` y el agente orquesta automática
 **Resultado**: 
 - ✅ **GLOSSARY.md** (root) - Términos formalizados, compartidos por todos los proyectos
 - ✅ **{project_slug}/requirements-set/** - Requisitos validados, scored ≥90
-- ✅ **{project_slug}/docs/adr/** - Decisiones arquitectónicas documentadas
 - ✅ **Trazabilidad completa** - needs → requirements → verification
 
 ---
@@ -172,14 +171,16 @@ USER invoca: /interview-requirements "Búsqueda Avanzada"
    ├── GLOSSARY.md (root-level, centralized - shared by all projects)
    ├── {project_slug}/
    │   ├── requirements-set/ (todos REQ scored ≥90)
-   │   ├── docs/adr/ (decisiones arquitectónicas)
    │   └── requirements-summary.md (resumen ejecutivo)
    └── {another_project_slug}/
-       ├── requirements-set/
-       └── docs/adr/
+       └── requirements-set/
 ```
 
---- (root-level, centralized)
+---
+
+## 📋 Archivos Generados por el Workflow
+
+### GLOSSARY.md (root-level, centralized)
 ```markdown
 ## Search_System
 Definition: System component responsible for...
@@ -194,11 +195,7 @@ Definition: External service for payment processing...
 ```
 *Same GLOSSARY.md is referenced by all projects*
 
-### busqueda-avanzada/earch_Results
-Definition: Data structure containing...
-```
-
-### requirements-set/REQ-001-search.md
+### busqueda-avanzada/requirements-set/REQ-001-search.md
 ```markdown
 # REQ-001: Search Performance
 
@@ -206,27 +203,18 @@ Definition: Data structure containing...
 Search_Results within 3 seconds...
 
 **Quality Score**: 95/100 ✅
-busqueda-avanzada/docs/adr/0001-search-algorithm.md
-```markdown
-# ADR-0001: Elasticsearch Selection
 
-## Decision
-Use Elasticsearch for search indexing
-
-## Rationale
-- Scalability to 1M documents
+**Verification Method**: Test
 ```
 
-### payment-integration/docs/adr/0001-payment-processor.md
+### payment-integration/requirements-set/REQ-001-payment.md
 ```markdown
-# ADR-0001: Stripe Selection
+# REQ-001: Payment Processing
 
-## Decision
-Use Stripe for payment processing
-Use Elasticsearch for search indexing
+**Requirement**: The Payment_Gateway shall process
+transactions within 5 seconds...
 
-## Rationale
-- Scalability to 1M documents
+**Quality Score**: 92/100 ✅
 ```
 
 ---
@@ -242,7 +230,6 @@ Use Elasticsearch for search indexing
 ### Fase: Requirements-Modeling ✅
 - [ ] GLOSSARY.md contiene todos los términos
 - [ ] requirements-set/ tiene requisitos candidatos
-- [ ] ADRs documentan decisiones
 - [ ] Sin contradicciones entre requisitos
 
 ### Fase: Requirements-Writer ✅

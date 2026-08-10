@@ -6,7 +6,7 @@ description: |
   2. Run /requirements-modeling to formalize requirements
   3. Run /requirements-writer-skill to validate and score
   4. Handle feedback loops until all requirements >= 90/100
-  5. Produce final deliverable (GLOSSARY.md [shared], project-slug/requirements-set/, project-slug/docs/adr/)
+  5. Produce final deliverable (GLOSSARY.md [shared], project-slug/requirements-set/)
 
 applyTo:
   - "user wants to capture requirements"
@@ -63,8 +63,7 @@ Instead, execute automatically in sequence:
    - Invoke: `/requirements-modeling` with grilling output + project_slug
    - Update: `GLOSSARY.md` (root-level, shared by all projects)
    - Create: `{project_slug}/requirements-set/` directory
-   - Create: `{project_slug}/docs/adr/` directory
-   - Collect: GLOSSARY updates, requirement candidates, ADRs
+   - Collect: GLOSSARY updates, requirement candidates
    - Ensure: no contradictions between requirements
 
 3. **Phase 3: Validation** - Score and verify
@@ -88,4 +87,4 @@ Instead, execute automatically in sequence:
 
 **Never skip phases. Always complete each phase before moving to next.**
 **GLOSSARY.md is centralized at root level (shared by all projects).**
-**Each project uses its own {project_slug}/requirements-set/ and {project_slug}/docs/adr/ directories.**
+**Each project uses its own {project_slug}/requirements-set/ directory.**
