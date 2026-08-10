@@ -2,7 +2,7 @@
 name: interview-requirements
 description: |
   Orchestrate a complete requirements engineering workflow:
-  1. Run /grilling session to extract stakeholder needs
+  1. Run /grilling-requirements session to extract stakeholder needs
   2. Run /requirements-modeling to formalize requirements
   3. Run /requirements-writer-skill to validate and score
   4. Handle feedback loops until all requirements >= 90/100
@@ -22,12 +22,12 @@ slug_transformation: |
   - Example: "Payment Integration" → "payment-integration"
 
 invokes:
-  - skill: grilling
+  - skill: grilling-requirements
     with_context: [project_name, project_slug, stakeholders, scope]
-    expect_output: grilling_output (needs, decisions, ambiguities, terminology, project_slug)
+    expect_output: grilling_requirements_output (needs, decisions, ambiguities, terminology, project_slug)
   
   - skill: requirements-modeling
-    with_input: [grilling_output, project_slug]
+    with_input: [grilling_requirements_output, project_slug]
     expect_output: modeling_output (glossary, requirement_candidates, adrs, project_slug)
   
   - skill: requirements-writer-skill
@@ -53,8 +53,8 @@ Instead, execute automatically in sequence:
    - Propagate: project_slug to all phases
    - All output will use: `{project_slug}/` directory structure
 
-1. **Phase 1: Grilling** - Extract needs through relentless questioning
-   - Invoke: `/grilling` with project context + project_slug
+1. **Phase 1: Grilling-requirements** - Extract needs through relentless questioning
+   - Invoke: `/grilling-requirements` with project context + project_slug
    - Collect: needs, decisions, ambiguities, terminology
    - Proceed only when session complete
    - Output includes: project_slug for downstream use

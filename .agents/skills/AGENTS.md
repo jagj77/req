@@ -2,7 +2,7 @@
 
 ## Visión General
 
-Define cómo los skills `grilling`, `requirements-modeling`, y `requirements-writer-skill` se orquestan desde `interview-requirements`.
+Define cómo los skills `grilling-requirements`, `requirements-modeling`, y `requirements-writer-skill` se orquestan desde `interview-requirements`.
 
 ---
 
@@ -18,7 +18,7 @@ Orquestar el flujo completo de captura y documentación de requisitos.
 name: interview-requirements
 description: |
   Sesión integrada de elicitación de requisitos que ejecuta:
-  1. Entrevista profunda con /grilling
+  1. Entrevista profunda con /grilling-requirements
   2. Modelado de requisitos con /requirements-modeling
   3. Validación y escritura con /requirements-writer-skill
   
@@ -33,16 +33,16 @@ applyTo:
 disable-model-invocation: true
 
 invokes:
-  - skill: grilling
+  - skill: grilling-requirements
     when: "initial elicitation"
     context:
       pass: [project_description, stakeholders, scope]
       expect: [needs_articulated, design_decisions, ambiguities]
       
   - skill: requirements-modeling
-    when: "after grilling produces output"
+    when: "after grilling-requirements produces output"
     context:
-      pass: [grilling_output, existing_glossary, existing_requirements]
+      pass: [grilling_requirements_output, existing_glossary, existing_requirements]
       expect: [glossary_updated, requirements_formalized, adrs_created]
       
   - skill: requirements-writer-skill
@@ -77,13 +77,13 @@ Run a comprehensive requirements elicitation and formalization session:
    - Check for existing docs/adr/
    - Create if not present (lazy creation)
 
-2. Execute /grilling session
+2. Execute /grilling-requirements session
    - Topic: Capture stakeholder needs for [project/feature]
    - Duration: Until all design tree branches explored
    - Output: Needs, decisions, ambiguities documented
 
 3. Transition to /requirements-modeling
-   - Input: Grilling output
+   - Input: Grilling-requirements output
    - Activity: Challenge language, sharpen terminology
    - Activity: Create edge-case scenarios
    - Activity: Update GLOSSARY.md in real-time
@@ -115,18 +115,18 @@ Run a comprehensive requirements elicitation and formalization session:
 
 ### Handoff Protocol
 
-#### Grilling → Requirements-Modeling
+#### Grilling-requirements → Requirements-Modeling
 
 ```
-INPUT from grilling:
+INPUT from grilling-requirements:
   • user_needs: [list of articulated needs]
-  • design_decisions: [decisions made during grilling]
+  • design_decisions: [decisions made during grilling-requirements]
   • stakeholder_concerns: [areas of disagreement/ambiguity]
   • terminology: [terms used that need definition]
   • dependencies: [identified dependencies between needs]
 
 INSTRUCTION to requirements-modeling:
-  "Use these grilling outputs to:
+  "Use these grilling-requirements outputs to:
    1. Formalize terminology into GLOSSARY.md
    2. Challenge ambiguous terms with scenarios
    3. Create structured requirement candidates
@@ -230,7 +230,7 @@ REQUIREMENTS-WRITER-SKILL RESUMES:
 
 ---
 
-## Skill: grilling
+## Skill: grilling-requirements
 
 ### Propósito
 Ejecutar cuestionamiento relentless para extraer necesidades y decisiones de diseño.
@@ -239,7 +239,7 @@ Ejecutar cuestionamiento relentless para extraer necesidades y decisiones de dis
 
 ```yaml
 ---
-name: grilling
+name: grilling-requirements
 description: |
   Interview the user relentlessly about a plan or design
   until reaching shared understanding. Walk design tree
@@ -264,19 +264,19 @@ receives_from:
 
 sends_to:
   - skill: requirements-modeling
-    output: grilling_output
+    output: grilling_requirements_output
     contains: [needs_list, decisions, ambiguities, terminology, dependencies]
 
 ---
 
-## Grilling Protocol
+## Grilling-requirements Protocol
 
 ### Question Pattern (Always One Per Turn)
 
 ```
 TURN N:
 ┌──────────────────────────────────────────┐
-│ GRILLING SKILL ASKS:                     │
+│ GRILLING-REQUIREMENTS SKILL ASKS:                     │
 │                                          │
 │ "What is [aspect of design]?"           │
 │                                          │
@@ -286,7 +286,7 @@ TURN N:
 USER RESPONDS
          ↓
 ┌──────────────────────────────────────────┐
-│ GRILLING SKILL ACKNOWLEDGES              │
+│ GRILLING-REQUIREMENTS SKILL ACKNOWLEDGES              │
 │ "OK, so [repeats understanding]"        │
 │                                          │
 │ NEXT QUESTION (based on response):      │
@@ -337,7 +337,7 @@ Questions should cover:
 ### Output Format
 
 ```
-# Grilling Session Output
+# Grilling-requirements Session Output
 
 ## Project: [name]
 ## Date: [date]
@@ -413,8 +413,8 @@ protocol:
   lazy_creation: "only create files when content exists"
 
 receives_from:
-  - skill: grilling
-    parameter: grilling_output
+  - skill: grilling-requirements
+    parameter: grilling_requirements_output
     
   - skill: requirements-writer-skill
     parameter: clarification_request

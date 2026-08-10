@@ -2,7 +2,7 @@
 name: requirements-modeling
 description: |
   Formalize and sharpen the requirements model by:
-  - Challenging fuzzy language from grilling output
+  - Challenging fuzzy language from grilling-requirements output
   - Creating edge-case scenarios
   - Updating GLOSSARY.md in real-time
   - Documenting requirement candidates
@@ -15,7 +15,7 @@ applyTo:
   - invoked_by: "interview-requirements"
 
 input_format: |
-  Receives from /grilling (Phase 2) OR /requirements-writer-skill (feedback loop):
+  Receives from /grilling-requirements (Phase 2) OR /requirements-writer-skill (feedback loop):
   
   Phase 2 Input (from grilling):
   - project_slug: Directory slug for {project_slug}/requirements-set/

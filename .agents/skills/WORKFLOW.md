@@ -5,7 +5,7 @@
 ```
 USER: /interview-requirements [project description]
   ↓
-GRILLING: Ask questions one-at-a-time → needs + decisions
+GRILLING-REQUIREMENTS: Ask questions one-at-a-time → needs + decisions
   ↓
 REQUIREMENTS-MODELING: Formalize → GLOSSARY.md + REQ candidates + ADRs
   ↓
@@ -21,8 +21,8 @@ OUTPUT: requirements-set/, GLOSSARY.md, docs/adr/
 | Skill | Hace | Entrada | Salida |
 |-------|------|---------|--------|
 | **interview-requirements** | Orquesta todo | Descripción proyecto | Deliverable final |
-| **grilling** | Entrevista profunda | Contexto | Necesidades+decisiones |
-| **requirements-modeling** | Formaliza modelo | Grilling output | GLOSSARY+REQ+ADRs |
+| **grilling-requirements** | Entrevista profunda | Contexto | Necesidades+decisiones |
+| **requirements-modeling** | Formaliza modelo | Grilling-requirements output | GLOSSARY+REQ+ADRs |
 | **requirements-writer-skill** | Valida requisitos | REQ candidatos | REQ scored ✅ |
 
 ---
@@ -53,16 +53,16 @@ PROJECT/
   Stakeholders: Usuarios finales, Marketing, Producto
 ```
 
-### Paso 2️⃣ : Grilling (Extracción)
+### Paso 2️⃣ : Grilling-requirements (Extracción)
 
 ```
-GRILLING Q1: "¿Cuál es el mayor problema que resuelve?"
+GRILLING-REQUIREMENTS Q1: "¿Cuál es el mayor problema que resuelve?"
    USER: "Usuarios no encuentran docs antiguos"
    
-GRILLING Q2: "¿Cuántos docs típicamente?"
+GRILLING-REQUIREMENTS Q2: "¿Cuántos docs típicamente?"
    USER: "100k a 1M"
    
-GRILLING Q3: "¿Máximo tiempo aceptable?"
+GRILLING-REQUIREMENTS Q3: "¿Máximo tiempo aceptable?"
    USER: "< 3 segundos"
    
 [... continúa ...]
@@ -154,7 +154,7 @@ o refinar existente
 
 ## Criterios de Completitud
 
-✅ **GRILLING completado cuando:**
+✅ **GRILLING-REQUIREMENTS completado cuando:**
 - [ ] Todas las branches del design tree exploradas
 - [ ] Dependencias entre decisiones resueltas
 - [ ] Stakeholder needs articuladas
@@ -187,8 +187,8 @@ o refinar existente
 # Iniciar flujo completo
 /interview-requirements "Descripción del proyecto"
 
-# Solo grilling
-/grilling
+# Solo grilling-requirements
+/grilling-requirements
 
 # Solo modelado
 /requirements-modeling
@@ -208,7 +208,7 @@ Abrir: REQ/docs/adr/
 
 | Término | Significa |
 |---------|-----------|
-| **Grilling** | Preguntar relentlessly, uno/uno |
+| **Grilling-requirements** | Preguntar relentlessly, uno/uno |
 | **Modeling** | Formalizar términos + estructura |
 | **Glossary** | Hub central de términos |
 | **REQ-NNN** | Requisito con ID único |
@@ -222,7 +222,7 @@ Abrir: REQ/docs/adr/
 ## Errores Comunes
 
 ❌ **NO hacer:**
-- Preguntar múltiples preguntas a la vez (grilling)
+- Preguntar múltiples preguntas a la vez (grilling-requirements)
 - Batching glossary updates (formalizar en tiempo real)
 - Saltar requirements-writer validation (todos ≥90)
 - Requisitos sin verification method
@@ -239,7 +239,7 @@ Abrir: REQ/docs/adr/
 
 | Fase | Duración | Salida |
 |------|----------|--------|
-| Grilling | 30-60 min | Necesidades articuladas |
+| Grilling-requirements | 30-60 min | Necesidades articuladas |
 | Modeling | 45-90 min | GLOSSARY + REQ candidatos + ADRs |
 | Validation | 30-60 min | REQ finales scored |
 | **Total** | **2-4 horas** | **Requisitos de calidad** |

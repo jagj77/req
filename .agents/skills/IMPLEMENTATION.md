@@ -18,19 +18,19 @@ USER: /interview-requirements "Búsqueda Avanzada"
 [interview-requirements/SKILL.md]
   - Recibe input del usuario
   - Inicializa contexto (proyecto, stakeholders, scope)
-  - INVOCA /grilling CON PARÁMETROS
+  - INVOCA /grilling-requirements CON PARÁMETROS
   ↓
-[grilling/SKILL.md]
+[grilling-requirements/SKILL.md]
   - Recibe contexto
   - Ejecuta sesión
-  - RETORNA: grilling_output (JSON/estructura)
+  - RETORNA: grilling_requirements_output (JSON/estructura)
   ↓
 [interview-requirements/SKILL.md]
-  - Captura grilling_output
-  - INVOCA /requirements-modeling CON grilling_output
+  - Captura grilling_requirements_output
+  - INVOCA /requirements-modeling CON grilling_requirements_output
   ↓
 [requirements-modeling/SKILL.md]
-  - Recibe grilling_output
+  - Recibe grilling_requirements_output
   - Ejecuta actividades
   - RETORNA: requirement_candidates (JSON)
   ↓
@@ -77,7 +77,7 @@ description: A relentless interview to sharpen a plan or design, which also crea
 disable-model-invocation: true
 ---
 
-Run a `/grilling` session, using the `/requirements-writer-skill` skill.
+Run a `/grilling-requirements` session, using the `/requirements-writer-skill` skill.
 ```
 
 ### Problema
@@ -93,7 +93,7 @@ Run a `/grilling` session, using the `/requirements-writer-skill` skill.
 name: interview-requirements
 description: |
   Orchestrate a complete requirements engineering workflow:
-  1. Run /grilling session to extract needs
+  1. Run /grilling-requirements session to extract needs
   2. Run /requirements-modeling to formalize requirements
   3. Run /requirements-writer-skill to validate and score
   4. Handle feedback loops and produce final deliverable
@@ -116,19 +116,19 @@ orchestration:
 
 workflow:
   step1_grilling:
-    skill: grilling
+    skill: grilling-requirements
     pass:
       project_name: $project_name
       stakeholders: $stakeholders
       scope: $scope
     expect:
-      output_var: grilling_output
+      output_var: grilling_requirements_output
       contains: [needs, decisions, ambiguities, terminology, dependencies]
     
   step2_modeling:
     skill: requirements-modeling
     pass:
-      grilling_output: $grilling_output
+      grilling_requirements_output: $grilling_requirements_output
     expect:
       output_var: modeling_output
       contains: [glossary_updates, requirement_candidates, adrs]
@@ -178,7 +178,7 @@ workflow:
    - Do not proceed until user confirms readiness
 
 3. Modeling Phase
-   - Call: `/requirements-modeling with grilling_output`
+   - Call: `/requirements-modeling with grilling_requirements_output`
    - Wait for completion
    - Capture: GLOSSARY.md, requirement_candidates, ADRs
 
@@ -216,12 +216,12 @@ workflow:
 
 ---
 
-## CAMBIO 2: grilling/SKILL.md
+## CAMBIO 2: grilling-requirements/SKILL.md
 
 ### Estado Actual
 ```yaml
 ---
-name: grilling
+name: grilling-requirements
 description: Interview the user relentlessly about a plan or design. Use when the user wants to stress-test a plan before building, or uses any 'grill' trigger phrases.
 ---
 
@@ -237,11 +237,11 @@ If a question can be answered by exploring the codebase, explore the codebase in
 - No define estructura de output
 - No menciona cómo será invocado programáticamente
 
-### Solución: Grilling Mejorado
+### Solución: Grilling-requirements Mejorado
 
 ```yaml
 ---
-name: grilling
+name: grilling-requirements
 description: |
   Execute relentless one-at-a-time questioning to extract stakeholder needs,
   design decisions, and identify ambiguities. Produces structured output for
@@ -299,7 +299,7 @@ send_to: requirements-modeling
 
 ---
 
-## Grilling Execution
+## Grilling-requirements Execution
 
 Interview user one question at a time:
 
@@ -372,7 +372,7 @@ description: Build and sharpen a project's requirements model. Use when the user
 name: requirements-modeling
 description: |
   Formalize and sharpen the requirements model by:
-  - Challenging fuzzy language from grilling output
+  - Challenging fuzzy language from grilling-requirements output
   - Creating edge-case scenarios
   - Updating GLOSSARY.md in real-time
   - Documenting requirement candidates
@@ -385,7 +385,7 @@ applyTo:
   - invoked_by: "interview-requirements"
 
 input_format: |
-  Receives output from /grilling skill:
+  Receives output from /grilling-requirements skill:
   
   {
     "articulated_needs": [...],
@@ -638,7 +638,7 @@ For each requirement candidate:
 | SKILL.md | Cambio Principal | Impacto |
 |----------|------------------|--------|
 | **interview-requirements** | Agregar workflow orchestration (steps, passes, expect) | 🔴 CRÍTICO - Define todo el flujo |
-| **grilling** | Agregar output_format JSON | 🟡 IMPORTANTE - Debe pasar datos al siguiente skill |
+| **grilling-requirements** | Agregar output_format JSON | 🟡 IMPORTANTE - Debe pasar datos al siguiente skill |
 | **requirements-modeling** | Agregar input_format + output_format JSON | 🟡 IMPORTANTE - Debe recibir y enviar estructurado |
 | **requirements-writer-skill** | Agregar input_format + output_format + clarification_requests | 🟡 IMPORTANTE - Feedback loops |
 
@@ -650,7 +650,7 @@ For each requirement candidate:
 - Copiar configuración de arriba
 - Testear que reconoce parámetros
 
-### Paso 2: Actualizar grilling/SKILL.md
+### Paso 2: Actualizar grilling-requirements/SKILL.md
 - Agregar output_format
 - Verificar que produce JSON
 - Verificar que se puede capturar structured output
@@ -672,7 +672,7 @@ For each requirement candidate:
 ```
 
 Verificar:
-- ✅ interview-requirements invoca grilling
+- ✅ interview-requirements invoca grilling-requirements
 - ✅ grilling produce output estructurado
 - ✅ interview-requirements captura y invoca requirements-modeling
 - ✅ requirements-modeling produce output estructurado
@@ -723,7 +723,7 @@ USER: /interview-requirements "Búsqueda Avanzada"
 interview-requirements orquesta automáticamente:
   → Invoca /grilling CON parámetros
   → Captura output JSON
-  → Invoca /requirements-modeling CON grilling_output
+  → Invoca /requirements-modeling CON grilling_requirements_output
   → Captura output JSON
   → Invoca /requirements-writer-skill CON requirement_candidates
   → Si score < 90: Feedback loop

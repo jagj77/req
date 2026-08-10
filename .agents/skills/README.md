@@ -5,7 +5,7 @@
 Este repositorio contiene cuatro skills integrados que orquestan un workflow end-to-end de **captura, análisis y documentación de requisitos** basado en la metodología **INCOSE Systems Engineering**.
 
 El usuario inicia con `/interview-requirements` y el agente orquesta automáticamente:
-1. `/grilling` - Extrae necesidades (preguntas 1x1)
+1. `/grilling-requirements` - Extrae necesidades (preguntas 1x1)
 2. `/requirements-modeling` - Formaliza (GLOSSARY + REQ candidatos + ADRs)
 3. `/requirements-writer-skill` - Valida (Characteristics + Rules + Score)
 4. Feedback loops automáticos si algún requisito scores < 90/100
@@ -66,7 +66,7 @@ El usuario inicia con `/interview-requirements` y el agente orquesta automática
 
 ```
 Invoca automáticamente:
-1. /grilling → Captura needs, decisions, ambiguities
+1. /grilling-requirements → Captura needs, decisions, ambiguities
 2. /requirements-modeling → Formaliza GLOSSARY + REQ candidatos
 3. /requirements-writer-skill → Valida y score
 4. Loops feedback si score < 90
@@ -75,7 +75,7 @@ Invoca automáticamente:
 
 📍 Archivo: [interview-requirements/SKILL.md](./interview-requirements/SKILL.md)
 
-### 2. grilling
+### 2. grilling-requirements
 **Estado**: ✅ Actualizado para output estructurado
 
 ```
@@ -87,7 +87,7 @@ Extrae mediante cuestionamiento:
 - dependencies_identified
 ```
 
-📍 Archivo: [grilling/SKILL.md](./grilling/SKILL.md)
+📍 Archivo: [grilling-requirements/SKILL.md](./grilling-requirements/SKILL.md)
 
 ### 3. requirements-modeling
 **Estado**: ✅ Actualizado para input/output estructurado
@@ -130,12 +130,12 @@ USER invoca: /interview-requirements "Búsqueda Avanzada"
 [interview-requirements ORQUESTA automáticamente]
     ↓
 ┌─────────────────────────────┐
-│  /grilling                  │  ← Extrae necesidades
+│  /grilling-requirements     │  ← Extrae necesidades
 │  one-at-a-time questions   │     Retorna: structured output
 └─────────────────────────────┘
     ↓
 ┌─────────────────────────────┐
-│  /requirements-modeling     │  ← Recibe grilling output
+│  /requirements-modeling     │  ← Recibe grilling-requirements output
 │  Challenge language         │     Formaliza terminología
 │  Create scenarios           │     Retorna: GLOSSARY + REQ candidatos
 │  Update GLOSSARY.md         │
@@ -327,7 +327,7 @@ Ver [requirements-writer-skill/requirements-engineering.md](./requirements-write
 | Skill | SKILL.md | Detalles | Entrada |
 |-------|----------|---------|---------|
 | interview-requirements | [✓](./interview-requirements/SKILL.md) | Orquestación | Descripción proyecto |
-| grilling | [✓](./grilling/SKILL.md) | Preguntas 1x1 | Contexto |
+| grilling-requirements | [✓](./grilling-requirements/SKILL.md) | Preguntas 1x1 | Contexto |
 | requirements-modeling | [✓](./requirements-modeling/SKILL.md) | Formalización | Grilling output |
 | requirements-writer-skill | [✓](./requirements-writer-skill/SKILL.md) | Validación | REQ candidatos |
 
@@ -393,7 +393,7 @@ PROJECT/REQ/
 - Define fases 1-5
 - Implementa feedback loops
 
-✅ **grilling/SKILL.md**
+✅ **grilling-requirements/SKILL.md**
 - Especifica output estructurado
 - Define protocolo de datos
 

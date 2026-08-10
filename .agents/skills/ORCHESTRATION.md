@@ -16,7 +16,7 @@ USER LAUNCHES INTERVIEW-REQUIREMENTS
 └─────────────────────────────────────────────────┘
     ↓
 ┌─────────────────────────────────────────────────┐
-│  SKILL: grilling                                │
+│  SKILL: grilling-requirements                         │
 │  ─────────────────────────────────────────────  │
 │  • Asks relentless, one-at-a-time questions    │
 │  • Stress-tests design decisions                │
@@ -63,7 +63,7 @@ USER LAUNCHES INTERVIEW-REQUIREMENTS
 **Acciones**:
 1. Recibe el pedido del usuario de capturar/refinar requisitos
 2. Inicializa contexto: proyecto, stakeholders, ámbito
-3. Invoca `/grilling` para sesión de entrevista profunda
+3. Invoca `/grilling-requirements` para sesión de entrevista profunda
 4. Coordina handoff a `requirements-modeling` cuando emerge contenido
 5. Coordina validación final con `requirements-writer-skill`
 
@@ -73,13 +73,13 @@ USER LAUNCHES INTERVIEW-REQUIREMENTS
 - Stakeholders identificados
 
 **Salida a siguiente fase**: 
-- Notas de sesión de grilling
+- Notas de sesión de grilling-requirements
 - Candidatos de requisitos emergentes
 - Decisiones pendientes
 
 ---
 
-### FASE 2: Elicitación Profunda (grilling)
+### FASE 2: Elicitación Profunda (grilling-requirements)
 
 **Responsabilidad**: Extraer conocimiento mediante cuestionamiento relentless
 
@@ -291,19 +291,19 @@ requirements-set/REQ-001-search.md
 
 ## Comunicación Entre Skills
 
-### Interview-Requirements → Grilling
+### Interview-Requirements → Grilling-requirements
 ```
-"Realicemos una sesión de grilling sobre los requisitos de búsqueda.
+\"Realicemos una sesión de grilling-requirements sobre los requisitos de búsqueda.
  Stakeholders: usuários finales, equipo de marketing.
  Ámbito: feature de search del portal."
 
-GRILLING: Comienza con preguntas sobre necesidades, casos de uso, 
+GRILLING-REQUIREMENTS: Comienza con preguntas sobre necesidades, casos de uso, 
          volumetría, performance expectations, etc.
 ```
 
-### Grilling → Requirements-Modeling
+### Grilling-requirements → Requirements-Modeling
 ```
-Durante grilling, emergen términos como:
+Durante grilling-requirements, emergen términos como:
 - "Search_Query" (qué es?)
 - "Query Performance" (cómo se mide?)
 - "Relevancia" (qué tan relevante es "relevante"?)
@@ -341,7 +341,7 @@ PROJECT/
 ├── .agents/
 │   └── skills/
 │       ├── interview-requirements/
-│       ├── grilling/
+│       ├── grilling-requirements/
 │       ├── requirements-modeling/
 │       └── requirements-writer-skill/
 │
@@ -558,7 +558,7 @@ Para que el workflow sea "completo":
 ## Puntos de Integración Críticos
 
 ### 1. GLOSSARY.md es el Hub
-- **Grilling** identifica términos
+- **Grilling-requirements** identifica términos
 - **Requirements-Modeling** los formaliza
 - **Requirements-Writer** los valida y usa
 - **TODOS** consultan antes de introducir nuevos términos

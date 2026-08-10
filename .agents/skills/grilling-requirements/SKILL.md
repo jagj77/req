@@ -1,5 +1,5 @@
 ---
-name: grilling
+name: grilling-requirements
 description: |
   Execute relentless one-at-a-time questioning to extract stakeholder needs,
   design decisions, and identify ambiguities. Produces structured output for
