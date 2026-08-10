@@ -40,15 +40,20 @@ documentation:
 output_structure: |
   /req/
   ├── .req-config.yml (this file)
-  ├── GLOSSARY.md (centralized, in configured/detected language)
+  ├── GLOSSARY.md (centralized, in configured/detected language, NO SUFFIX)
+  ├── .agents/skills/templates/
+  │   ├── REQ-NNN.md (Spanish reference template)
+  │   ├── REQ-NNN-en.md (English reference template)
+  │   ├── GLOSSARY.md (Spanish reference template)
+  │   └── GLOSSARY-en.md (English reference template)
   ├── {project_slug}/
   │   └── requirements-set/
-  │       ├── REQ-001.md (in configured/detected language)
+  │       ├── REQ-001.md (in configured/detected language, NO SUFFIX)
   │       ├── REQ-002.md
   │       └── requirements-summary.md (in configured/detected language)
   └── {another_project_slug}/
       └── requirements-set/
-          ├── REQ-001.md (in configured/detected language)
+          ├── REQ-001.md (in configured/detected language, NO SUFFIX)
           └── requirements-summary.md
 
 # Language-specific settings

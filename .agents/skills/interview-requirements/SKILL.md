@@ -61,7 +61,7 @@ Instead, execute automatically in sequence:
    - Generate: project_slug (e.g., "busqueda-avanzada")
    - Detect: language from project_name (auto or explicit parameter)
    - Propagate: project_slug + language to all phases
-   - All output will use: `{project_slug}/` directory structure in detected language
+   - All output will use: `/req/{project_slug}/requirements-set/` directory structure in detected language
 
 1. **Phase 1: Grilling-requirements** - Extract needs through relentless questioning
    - Invoke: `/grilling-requirements` with project context + project_slug + language
@@ -72,15 +72,15 @@ Instead, execute automatically in sequence:
 
 2. **Phase 2: Requirements Modeling** - Formalize and structure
    - Invoke: `/requirements-modeling` with grilling output + project_slug + language
-   - Update: `GLOSSARY.md` (root-level, shared by all projects, in current language)
-   - Create: `{project_slug}/requirements-set/` directory
-   - Generate: REQ-NNN.md (single language, e.g., REQ-001.md)
+   - Update: `/req/GLOSSARY.md` (root-level, shared by all projects, in current language)
+   - Create: `/req/{project_slug}/requirements-set/` directory
+   - Generate: `/req/{project_slug}/requirements-set/REQ-NNN.md` (single language, e.g., REQ-001.md)
    - Collect: GLOSSARY updates, requirement candidates, in specified language
    - Ensure: no contradictions between requirements
 
 3. **Phase 3: Validation** - Score and verify
    - Invoke: `/requirements-writer-skill` with requirement candidates + project_slug + language
-   - Read: `GLOSSARY.md` (centralized, root-level, in detected language)
+   - Read: `/req/GLOSSARY.md` (centralized, root-level, in detected language)
    - Check: all requirements scored >= 90/100
    - Feedback messages in: detected language
    - If any score < 90: Identify ambiguities
@@ -88,15 +88,15 @@ Instead, execute automatically in sequence:
 4. **Phase 4: Feedback Loops** - Iterate on low scores
    - For each requirement scored < 90:
      - Invoke: `/requirements-modeling` with clarification request + project_slug + language
-     - Wait: for updated `GLOSSARY.md` (root-level, same language)
+     - Wait: for updated `/req/GLOSSARY.md` (root-level, same language)
      - Invoke: `/requirements-writer-skill` again (re-evaluation) + project_slug + language
      - Repeat until all >= 90
 
 5. **Phase 5: Consolidation** - Produce final deliverable
-   - Verify: `GLOSSARY.md` (root-level) completeness in current language
-   - Create: `{project_slug}/requirements-set/requirements-summary.md` (in current language)
-   - List: all approved requirements (score >= 90) in `{project_slug}/requirements-set/` (single language)
-   - Report: "Requirements engineering complete for '{project_name}' (language: {language}). Output in: {project_slug}/"
+   - Verify: `/req/GLOSSARY.md` (root-level) completeness in current language
+   - Create: `/req/{project_slug}/requirements-set/requirements-summary.md` (in current language)
+   - List: all approved requirements (score >= 90) in `/req/{project_slug}/requirements-set/` (single language)
+   - Report: "Requirements engineering complete for '{project_name}' (language: {language}). Output in: /req/{project_slug}/"
 
 **Multi-Language Support (Single Language per Execution):**
 - ✅ Questions in grilling-requirements: Spanish (es) or English (en)
@@ -106,5 +106,5 @@ Instead, execute automatically in sequence:
 - ✅ Configuration: .req-config.yml defines default_language
 
 **Never skip phases. Always complete each phase before moving to next.**
-**GLOSSARY.md is centralized at root level (shared by all projects, single language per execution).**
-**Each project uses its own {project_slug}/requirements-set/ directory with single-language files.**
+**GLOSSARY.md is centralized at /req/GLOSSARY.md (shared by all projects, single language per execution).**
+**Each project uses its own /req/{project_slug}/requirements-set/ directory with single-language files.**

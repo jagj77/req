@@ -45,9 +45,9 @@ output_structure: |
 
 file_operations: |
   Create/Update these directories and files:
-  - GLOSSARY.md (root-level, centralized, shared by all projects, in current language)
-  - {project_slug}/requirements-set/REQ-NNN.md (each requirement, single language)
-  - {project_slug}/requirements-set/requirements-summary.md (final, in current language)
+  - /req/GLOSSARY.md (root-level, centralized, shared by all projects, in current language)
+  - /req/{project_slug}/requirements-set/REQ-NNN.md (each requirement, single language)
+  - /req/{project_slug}/requirements-set/requirements-summary.md (final, in current language)
 
 ---
 

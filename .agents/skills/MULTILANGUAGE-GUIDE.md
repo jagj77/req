@@ -48,6 +48,7 @@ language_detection_strategy: "auto"  # auto, explicit, o prompt
 └── busqueda-avanzada/
     └── requirements-set/
         ├── REQ-001.md (contenido en español)
+        ├── REQ-002.md
         └── requirements-summary.md (en español)
 ```
 
@@ -73,6 +74,7 @@ language_detection_strategy: "auto"  # auto, explicit, o prompt
 └── advanced-search/
     └── requirements-set/
         ├── REQ-001.md (content in English)
+        ├── REQ-002.md
         └── requirements-summary.md (in English)
 ```
 
@@ -95,6 +97,7 @@ language_detection_strategy: "auto"  # auto, explicit, o prompt
 ├── GLOSSARY.md (en español)
 └── payment-integration/
     └── requirements-set/
+        ├── REQ-002.md
         ├── REQ-001.md (contenido en español)
         └── requirements-summary.md (en español)
 ```
@@ -107,24 +110,26 @@ language_detection_strategy: "auto"  # auto, explicit, o prompt
 
 ```
 /req/
-├── .req-config.yml (configuración global)
-├── GLOSSARY.md (centralizado, idioma actual)
-│   └── Solo UNO: no hay GLOSSARY-es.md + GLOSSARY-en.md
+├── .req-config.yml (configuración global) - SIN sufijo)
+│   └── Una sola versión: generada en el idioma de ejecución
 │
 ├── busqueda-avanzada/
 │   └── requirements-set/
-│       ├── REQ-001.md (es o en, SIN sufijo)
+│       ├── REQ-001.md (idioma actual, SIN sufijo de idioma)
 │       ├── REQ-002.md
-│       ├── REQ-003.md
 │       └── requirements-summary.md
 │
 └── payment-integration/
     └── requirements-set/
-        ├── REQ-001.md (es o en, diferente del anterior)
+        ├── REQ-001.md (idioma actual, SIN sufijo de idioma)
         ├── REQ-002.md
         └── requirements-summary.md
 ```
 
+**Nota:** 
+- Los archivos generados NO tienen sufijo de idioma (REQ-001.md, no REQ-001-es.md)
+- El idioma está determinado por la ejecución, NO por el nombre del archivo
+- Templates de referencia existen en inglés y español (`templates/REQ-NNN-en.md`, `templates/REQ-NNN.md`)
 **Nota:** No hay `REQ-001-es.md` + `REQ-001-en.md`. Solo `REQ-001.md` en el idioma de la ejecución actual.
 
 ---

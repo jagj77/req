@@ -38,11 +38,11 @@ output_structure: |
 
 file_operations: |
   Read from:
-  - GLOSSARY.md (root-level, for term validation, centralized, in current language)
-  - {project_slug}/requirements-set/REQ-NNN.md (candidate requirements)
+  - /req/GLOSSARY.md (root-level, for term validation, centralized, in current language)
+  - /req/{project_slug}/requirements-set/REQ-NNN.md (candidate requirements)
   
   Write to:
-  - {project_slug}/requirements-set/REQ-NNN.md (updated with validation score, in current language)
+  - /req/{project_slug}/requirements-set/REQ-NNN.md (updated with validation score, in current language)
 
 verification: |
   If score < 90, return clarification_request with:
