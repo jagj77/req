@@ -3,7 +3,8 @@ name: grilling
 description: |
   Execute relentless one-at-a-time questioning to extract stakeholder needs,
   design decisions, and identify ambiguities. Produces structured output for
-  requirements-modeling phase.
+  requirements-modeling phase. All output is tagged with project_slug for
+  downstream directory organization.
 
 applyTo:
   - "user wants to stress-test a plan"
@@ -15,9 +16,18 @@ protocol:
   provide_recommendation: true
   wait_for_feedback: true
   explore_codebase: true
+  propagate_project_slug: true
+
+input_from_orchestrator: |
+  Receives from /interview-requirements:
+  - project_name: User's project/feature name
+  - project_slug: Auto-generated directory slug (lowercase, hyphenated)
+  - stakeholders: List of stakeholders
+  - scope: Project scope
 
 output_structure: |
   Produce structured output containing:
+  - project_slug: [PROPAGATE FROM INPUT] For downstream directory use
   - articulated_needs: Array of needs with stakeholder attribution
   - design_decisions: Array of decisions with rationale
   - identified_ambiguities: Terms/concepts that need clarification

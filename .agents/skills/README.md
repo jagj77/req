@@ -11,9 +11,9 @@ El usuario inicia con `/interview-requirements` y el agente orquesta automática
 4. Feedback loops automáticos si algún requisito scores < 90/100
 
 **Resultado**: 
-- ✅ **GLOSSARY.md** - Términos formalizados
-- ✅ **requirements-set/** - Requisitos validados, scored ≥90
-- ✅ **docs/adr/** - Decisiones arquitectónicas documentadas
+- ✅ **GLOSSARY.md** (root) - Términos formalizados, compartidos por todos los proyectos
+- ✅ **{project_slug}/requirements-set/** - Requisitos validados, scored ≥90
+- ✅ **{project_slug}/docs/adr/** - Decisiones arquitectónicas documentadas
 - ✅ **Trazabilidad completa** - needs → requirements → verification
 
 ---
@@ -169,17 +169,17 @@ USER invoca: /interview-requirements "Búsqueda Avanzada"
 [interview-requirements CONSOLIDA]
     ↓
 ✅ OUTPUT DELIVERABLE
-   ├── GLOSSARY.md (todos los términos)
-   ├── requirements-set/ (todos REQ scored ≥90)
-   ├── docs/adr/ (decisiones arquitectónicas)
-   └── requirements-summary.md (resumen ejecutivo)
+   ├── GLOSSARY.md (root-level, centralized - shared by all projects)
+   ├── {project_slug}/
+   │   ├── requirements-set/ (todos REQ scored ≥90)
+   │   ├── docs/adr/ (decisiones arquitectónicas)
+   │   └── requirements-summary.md (resumen ejecutivo)
+   └── {another_project_slug}/
+       ├── requirements-set/
+       └── docs/adr/
 ```
 
----
-
-## 📋 Archivos Generados por el Workflow
-
-### GLOSSARY.md
+--- (root-level, centralized)
 ```markdown
 ## Search_System
 Definition: System component responsible for...
@@ -187,6 +187,14 @@ Context: Used in [requirements]
 Related terms: Search_Query, Search_Results
 
 ## Search_Results
+Definition: Data structure containing...
+
+## Payment_Gateway
+Definition: External service for payment processing...
+```
+*Same GLOSSARY.md is referenced by all projects*
+
+### busqueda-avanzada/earch_Results
 Definition: Data structure containing...
 ```
 
@@ -198,15 +206,23 @@ Definition: Data structure containing...
 Search_Results within 3 seconds...
 
 **Quality Score**: 95/100 ✅
-
-**Verification Method**: Test
-```
-
-### docs/adr/0001-search-algorithm.md
+busqueda-avanzada/docs/adr/0001-search-algorithm.md
 ```markdown
 # ADR-0001: Elasticsearch Selection
 
 ## Decision
+Use Elasticsearch for search indexing
+
+## Rationale
+- Scalability to 1M documents
+```
+
+### payment-integration/docs/adr/0001-payment-processor.md
+```markdown
+# ADR-0001: Stripe Selection
+
+## Decision
+Use Stripe for payment processing
 Use Elasticsearch for search indexing
 
 ## Rationale

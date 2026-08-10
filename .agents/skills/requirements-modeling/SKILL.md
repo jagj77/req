@@ -15,25 +15,38 @@ applyTo:
   - invoked_by: "interview-requirements"
 
 input_format: |
-  Receives from /grilling:
+  Receives from /grilling (Phase 2) OR /requirements-writer-skill (feedback loop):
+  
+  Phase 2 Input (from grilling):
+  - project_slug: Directory slug for {project_slug}/requirements-set/ and {project_slug}/docs/adr/
   - articulated_needs
   - design_decisions
   - identified_ambiguities
   - terminology_introduced
   
-  OR receives from /requirements-writer-skill (feedback loop):
+  Feedback Loop Input (from requirements-writer-skill):
+  - project_slug: Directory slug for project-specific directories
   - requirement_id: "REQ-NNN"
   - issue: description of ambiguity
   - required_clarification: what needs clarifying
 
 output_structure: |
   Produces for interview-requirements:
-  - glossary_updates: New/updated terms in GLOSSARY.md
+  - project_slug: [PROPAGATE FROM INPUT] For downstream consistency
+  - glossary_updates: New/updated terms in GLOSSARY.md (root-level, shared)
   - requirement_candidates: Array of REQ-NNN candidates
-  - architectural_decisions: Array of ADRs
+  - architectural_decisions: Array of ADRs for {project_slug}/docs/adr/
   - clarifications_provided: (for feedback loops)
+  - directory_structure: {project_slug}/ [created if not exists]
   
   All must be structured and machine-readable.
+
+file_operations: |
+  Create/Update these directories and files:
+  - GLOSSARY.md (root-level, centralized, shared by all projects)
+  - {project_slug}/requirements-set/REQ-NNN.md (each requirement)
+  - {project_slug}/docs/adr/NNNN-decision-name.md (each decision)
+  - {project_slug}/requirements-set/requirements-summary.md (final)
 
 ---
 

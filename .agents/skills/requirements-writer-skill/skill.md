@@ -11,24 +11,36 @@ description: |
   - Assign quality score (50-100)
   - Select verification methods
   - Produce corrected requirements or request clarifications
+  - Use project_slug for all file I/O operations
 
 applyTo:
   - "requirement needs validation"
   - invoked_by: "interview-requirements"
 
 input_format: |
-  Receives from /requirements-modeling:
+  Receives from /requirements-modeling (Phase 3 or feedback loop):
+  - project_slug: Directory slug for {project_slug}/requirements-set/ operations
   - requirement_candidates: Array of REQ-NNN candidates
-  - glossary: Current GLOSSARY.md terms
+  - glossary: Current GLOSSARY.md terms (root-level, centralized)
 
 output_structure: |
   Produces for interview-requirements:
+  - project_slug: [PROPAGATE FROM INPUT] For downstream consistency
   - validated_requirements: Approved requirements (score >= 90)
   - clarification_requests: Requirements scoring < 90 with ambiguities
   - quality_scores: Score breakdown for each requirement
   - all_requirements_approved: true/false
+  - directory_operations: Read/Write paths using GLOSSARY.md (root) and {project_slug}/
   
   All must be structured and machine-readable.
+
+file_operations: |
+  Read from:
+  - GLOSSARY.md (root-level, for term validation, centralized)
+  - {project_slug}/requirements-set/REQ-NNN.md (candidate requirements)
+  
+  Write to:
+  - {project_slug}/requirements-set/REQ-NNN.md (updated with validation score)
 
 verification: |
   If score < 90, return clarification_request with:
@@ -36,9 +48,10 @@ verification: |
   - issue (what's wrong)
   - ambiguity (what's unclear)
   - question_for_modeling (what to clarify)
+  - project_slug: [PROPAGATE] For routing
   
   Interview-requirements will invoke requirements-modeling,
-  which will return clarifications, then you'll re-evaluate.
+  which will update GLOSSARY.md (root-level), then you'll re-evaluate.
 
 ---
 
