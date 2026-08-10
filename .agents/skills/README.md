@@ -4,9 +4,15 @@
 
 Este repositorio contiene cuatro skills integrados que orquestan un workflow end-to-end de **captura, análisis y documentación de requisitos** basado en la metodología **INCOSE Systems Engineering**.
 
-El usuario inicia con `/interview-requirements` y obtiene:
+El usuario inicia con `/interview-requirements` y el agente orquesta automáticamente:
+1. `/grilling` - Extrae necesidades (preguntas 1x1)
+2. `/requirements-modeling` - Formaliza (GLOSSARY + REQ candidatos + ADRs)
+3. `/requirements-writer-skill` - Valida (Characteristics + Rules + Score)
+4. Feedback loops automáticos si algún requisito scores < 90/100
+
+**Resultado**: 
 - ✅ **GLOSSARY.md** - Términos formalizados
-- ✅ **requirements-set/** - Requisitos validados, scored
+- ✅ **requirements-set/** - Requisitos validados, scored ≥90
 - ✅ **docs/adr/** - Decisiones arquitectónicas documentadas
 - ✅ **Trazabilidad completa** - needs → requirements → verification
 
@@ -33,12 +39,17 @@ El usuario inicia con `/interview-requirements` y obtiene:
 
 ### NIVEL 3: Implementación Técnica
 
-**[AGENTS.md](./AGENTS.md)**
+**[AGENTS.md](./AGENTS.md)** ← Especificación técnica (QUÉ debe pasar)
 - Configuración YAML de cada skill
 - Handoff protocols entre skills
 - Feedback loop protocols
-- Algoritmos detallados (grilling, modeling, validation)
-- Tabla de integración
+- Algoritmos detallados
+
+**[IMPLEMENTATION.md](./IMPLEMENTATION.md)** ← Guía de implementación (CÓMO hacerlo)
+- Cambios exactos necesarios en cada SKILL.md
+- Ejemplos de YAML mejorado
+- Protocolos de entrada/salida
+- Validación end-to-end
 
 ### NIVEL 4: Metodología Base
 
@@ -49,89 +60,119 @@ El usuario inicia con `/interview-requirements` y obtiene:
 
 ---
 
-## 🛠️ Los Cuatro Skills
+## 🛠️ Los Cuatro Skills (AHORA INTEGRADOS)
 
-### 1. interview-requirements
-**Orquestador Principal**
-- Inicia el flujo completo
-- Coordina entre otros skills
-- Produce deliverable final consolidado
+### 1. interview-requirements ⭐ ORQUESTADOR
+**Estado**: ✅ Actualizado para orquestar automáticamente
+
+```
+Invoca automáticamente:
+1. /grilling → Captura needs, decisions, ambiguities
+2. /requirements-modeling → Formaliza GLOSSARY + REQ candidatos
+3. /requirements-writer-skill → Valida y score
+4. Loops feedback si score < 90
+5. Consolida deliverable final
+```
 
 📍 Archivo: [interview-requirements/SKILL.md](./interview-requirements/SKILL.md)
 
 ### 2. grilling
-**Extracción de Requisitos**
-- Entrevista profunda
-- Una pregunta por turno
-- Camina design tree branches
-- Output: needs articuladas, decisiones, ambigüedades
+**Estado**: ✅ Actualizado para output estructurado
+
+```
+Extrae mediante cuestionamiento:
+- articulated_needs
+- design_decisions
+- identified_ambiguities
+- terminology_introduced
+- dependencies_identified
+```
 
 📍 Archivo: [grilling/SKILL.md](./grilling/SKILL.md)
 
 ### 3. requirements-modeling
-**Formalización del Modelo**
-- Afina terminología
+**Estado**: ✅ Actualizado para input/output estructurado
+
+```
+Formaliza y estructura:
+- Desafía lenguaje vago
 - Crea escenarios edge-case
 - Actualiza GLOSSARY.md en tiempo real
-- Documenta requisitos en requirements-set/
+- Documenta REQ-NNN candidatos
 - Registra ADRs
+- Retorna datos estructurados para interview-requirements
+```
 
 📍 Archivo: [requirements-modeling/SKILL.md](./requirements-modeling/SKILL.md)
 
 ### 4. requirements-writer-skill
-**Validación y Refinamiento**
+**Estado**: ✅ Actualizado para validación + feedback loops
+
+```
+Valida y refina:
 - Evalúa C1-C6 (características)
 - Verifica R1-R41 (reglas)
 - Aplica patterns
 - Corre review algorithm
 - Asigna quality score (50-100)
 - Selecciona verification method
+- Si score < 90: retorna clarification_request
+```
 
-📍 Archivos:
-- [SKILL.md](./requirements-writer-skill/SKILL.md) - Descripción
-- [characteristics.md](./requirements-writer-skill/characteristics.md) - C1-C6
-- [rules.md](./requirements-writer-skill/rules.md) - R1-R41
-- [patterns.md](./requirements-writer-skill/patterns.md) - Patrones
-- [review_algorithm.md](./requirements-writer-skill/review_algorithm.md) - Algoritmo
-- [examples.md](./requirements-writer-skill/examples.md) - Ejemplos
+📍 Archivo: [requirements-writer-skill/SKILL.md](./requirements-writer-skill/SKILL.md)
 
 ---
 
-## 🔄 Flujo de Ejecución
+## 🔄 Flujo de Ejecución (AUTOMÁTICO)
 
 ```
-USER invoca: /interview-requirements [proyecto]
+USER invoca: /interview-requirements "Búsqueda Avanzada"
     ↓
-[ORCHESTRATION PHASE]
+[interview-requirements ORQUESTA automáticamente]
     ↓
 ┌─────────────────────────────┐
 │  /grilling                  │  ← Extrae necesidades
-│  one-at-a-time questions   │
+│  one-at-a-time questions   │     Retorna: structured output
 └─────────────────────────────┘
     ↓
 ┌─────────────────────────────┐
-│  /requirements-modeling     │  ← Formaliza terminología
-│  Challenge language         │     Documenta decisiones
-│  Create scenarios           │
+│  /requirements-modeling     │  ← Recibe grilling output
+│  Challenge language         │     Formaliza terminología
+│  Create scenarios           │     Retorna: GLOSSARY + REQ candidatos
 │  Update GLOSSARY.md         │
 │  Document requirements      │
 │  Record ADRs                │
 └─────────────────────────────┘
     ↓
 ┌─────────────────────────────┐
-│  /requirements-writer-skill │  ← Valida requisitos
-│  Evaluate C1-C6             │     Asigna score
-│  Check R1-R41               │     Selecciona verificación
+│  /requirements-writer-skill │  ← Recibe REQ candidatos
+│  Evaluate C1-C6             │     Valida cada requisito
+│  Check R1-R41               │     Score: 50/70/90/100
 │  Apply patterns             │
-│  Run algorithm              │
+│  Run algorithm              │     Si score < 90:
+│  Assign score               │     ↓ retorna clarification_request
 └─────────────────────────────┘
     ↓
-[FEEDBACK LOOPS as needed]
+[FEEDBACK LOOP - si score < 90]
+    ↓
+┌─────────────────────────────┐
+│  /requirements-modeling     │  ← Recibe clarification_request
+│  (Loop)                     │     Actualiza GLOSSARY.md
+│                             │     Retorna: clarifications
+└─────────────────────────────┘
+    ↓
+┌─────────────────────────────┐
+│  /requirements-writer-skill │  ← Re-evalúa con GLOSSARY actualizado
+│  (Loop)                     │     Nuevo score: ≥90 → APROBADO
+└─────────────────────────────┘
+    ↓
+[interview-requirements CONSOLIDA]
     ↓
 ✅ OUTPUT DELIVERABLE
-   ├── GLOSSARY.md
-   ├── requirements-set/
-   └── docs/adr/
+   ├── GLOSSARY.md (todos los términos)
+   ├── requirements-set/ (todos REQ scored ≥90)
+   ├── docs/adr/ (decisiones arquitectónicas)
+   └── requirements-summary.md (resumen ejecutivo)
 ```
 
 ---
@@ -139,7 +180,7 @@ USER invoca: /interview-requirements [proyecto]
 ## 📋 Archivos Generados por el Workflow
 
 ### GLOSSARY.md
-```
+```markdown
 ## Search_System
 Definition: System component responsible for...
 Context: Used in [requirements]
@@ -147,26 +188,22 @@ Related terms: Search_Query, Search_Results
 
 ## Search_Results
 Definition: Data structure containing...
-Units: array of results
-Related terms: Search_System, Relevance_Score
 ```
 
 ### requirements-set/REQ-001-search.md
-```
+```markdown
 # REQ-001: Search Performance
 
 **Requirement**: The Search_System shall return 
 Search_Results within 3 seconds...
 
-**Quality Score**: 95/100
+**Quality Score**: 95/100 ✅
 
 **Verification Method**: Test
-
-**Related Glossary Terms**: [list]
 ```
 
 ### docs/adr/0001-search-algorithm.md
-```
+```markdown
 # ADR-0001: Elasticsearch Selection
 
 ## Decision
@@ -174,12 +211,6 @@ Use Elasticsearch for search indexing
 
 ## Rationale
 - Scalability to 1M documents
-- Full-text search capabilities
-- Performance requirements
-
-## Consequences
-- Additional infrastructure required
-- Operational complexity
 ```
 
 ---
@@ -228,7 +259,7 @@ Este workflow implementa:
 ✅ **Quality-Driven** (Principle P3)
 - Characteristics C1-C6
 - Rules R1-R41
-- Quality scoring
+- Quality scoring (minimum 90/100)
 
 ✅ **Formal Specification** (Principle P4)
 - SHALL-based requirements
@@ -243,6 +274,11 @@ Este workflow implementa:
 - Baseline requirements
 - Formal change control
 - Version control
+
+✅ **Feedback Loops** (Principle P7)
+- Automatic re-validation if score < 90
+- Iterative refinement
+- Continuous validation
 
 Ver [requirements-writer-skill/requirements-engineering.md](./requirements-writer-skill/requirements-engineering.md) para detalle.
 
@@ -264,14 +300,20 @@ Ver [requirements-writer-skill/requirements-engineering.md](./requirements-write
 
 ### Paso 3: Ejecuta /interview-requirements
 **Tiempo**: 2-4 horas (según complejidad)
-- Sigue el workflow
+- El agente orquesta automáticamente
+- Sigue los 5 pasos automáticamente
 - Obten tus requisitos
 
-### Paso 4: Revisa AGENTS.md si necesitas detalles técnicos
-**Tiempo**: 10 minutos
-- Configuración YAML
-- Handoff protocols
-- Feedback loops
+**Ejemplo**:
+```bash
+/interview-requirements "Búsqueda Avanzada" stakeholders="users,marketing,product" scope="Advanced search feature"
+```
+
+### Paso 4: Revisa AGENTS.md + IMPLEMENTATION.md si necesitas detalles técnicos
+**Tiempo**: 15 minutos
+- Especificación técnica (AGENTS.md)
+- Guía de implementación (IMPLEMENTATION.md)
+- Cómo actualizar SKILL.md si es necesario
 
 ---
 
@@ -279,12 +321,19 @@ Ver [requirements-writer-skill/requirements-engineering.md](./requirements-write
 
 ### Para cada skill, consulta:
 
-| Skill | SKILL.md | Detalles | Requisito de Entrada |
-|-------|----------|---------|------------------|
+| Skill | SKILL.md | Detalles | Entrada |
+|-------|----------|---------|---------|
 | interview-requirements | [✓](./interview-requirements/SKILL.md) | Orquestación | Descripción proyecto |
 | grilling | [✓](./grilling/SKILL.md) | Preguntas 1x1 | Contexto |
 | requirements-modeling | [✓](./requirements-modeling/SKILL.md) | Formalización | Grilling output |
 | requirements-writer-skill | [✓](./requirements-writer-skill/SKILL.md) | Validación | REQ candidatos |
+
+### Para documentación de integración:
+
+- [AGENTS.md](./AGENTS.md) - Especificación técnica de orquestación
+- [IMPLEMENTATION.md](./IMPLEMENTATION.md) - Guía de cambios en SKILL.md
+- [ORCHESTRATION.md](./ORCHESTRATION.md) - Flujo conceptual
+- [WORKFLOW.md](./WORKFLOW.md) - Guía rápida
 
 ### Para metodología INCOSE:
 
@@ -301,33 +350,62 @@ Ver [requirements-writer-skill/requirements-engineering.md](./requirements-write
 
 ---
 
-## 🎯 Resultado Final
+## 🎯 Resultado Final Garantizado
 
-Después de completar el workflow, tendrás:
+Después de completar el workflow automático, tendrás:
 
 ```
 PROJECT/REQ/
 ├── GLOSSARY.md
-│   └── Todos los términos formalizados
+│   └── Todos los términos formalizados y coherentes
 │
 ├── requirements-set/
-│   ├── REQ-001-[feature].md (scored ≥90)
-│   ├── REQ-002-[feature].md (scored ≥90)
-│   ├── REQ-003-[feature].md (scored ≥90)
-│   └── requirements-summary.md
+│   ├── REQ-001-[feature].md (scored ≥90, verificable)
+│   ├── REQ-002-[feature].md (scored ≥90, verificable)
+│   ├── REQ-003-[feature].md (scored ≥90, verificable)
+│   └── requirements-summary.md (resumen ejecutivo)
 │
 └── docs/adr/
-    ├── 0001-[decision].md
-    ├── 0002-[decision].md
+    ├── 0001-[decision].md (decisión + rationale)
+    ├── 0002-[decision].md (decisión + rationale)
     └── [...]
 ```
 
 **Calidad garantizada:**
 - ✅ Todos los requisitos scored ≥ 90/100
-- ✅ Métodos de verificación definidos
-- ✅ Trazabilidad completa
-- ✅ Ninguna ambigüedad
+- ✅ Métodos de verificación definidos para cada uno
+- ✅ Trazabilidad completa (needs → requirements → verification)
+- ✅ Ninguna ambigüedad o contradicción
+- ✅ Terminology consistente (GLOSSARY.md único)
 - ✅ Listo para diseño y desarrollo
+
+---
+
+## 🔑 Cambios Principales desde v1.0
+
+### Versión v2.0 (Actual) - ORQUESTACIÓN FUNCIONAL
+
+✅ **interview-requirements/SKILL.md**
+- Ahora especifica invocación automática de otros skills
+- Define fases 1-5
+- Implementa feedback loops
+
+✅ **grilling/SKILL.md**
+- Especifica output estructurado
+- Define protocolo de datos
+
+✅ **requirements-modeling/SKILL.md**
+- Especifica input/output format
+- Lista actividades principales
+
+✅ **requirements-writer-skill/SKILL.md**
+- Añade frontmatter YAML
+- Especifica input/output format
+- Define feedback loops
+
+✅ **IMPLEMENTATION.md** (NUEVO)
+- Guía exacta de cambios implementados
+- Valida que los SKILL.md cumplan AGENTS.md
 
 ---
 
@@ -335,11 +413,13 @@ PROJECT/REQ/
 
 - **WORKFLOW.md** - Guía rápida y cheat sheet
 - **ORCHESTRATION.md** - Flujo detallado y escenario real
-- **AGENTS.md** - Configuración técnica y protocolos
+- **AGENTS.md** - Especificación técnica (QUÉ debe pasar)
+- **IMPLEMENTATION.md** - Guía de implementación (CÓMO hacerlo)
 - **README.md** - Este documento (índice)
 
 ---
 
-**Versión**: 1.0  
+**Versión**: 2.0 (Orquestación Funcional)  
 **Basado en**: INCOSE Systems Engineering Handbook v4.0+  
+**Estado**: ✅ COMPLETAMENTE EJECUTABLE  
 **Últimas actualizaciones**: 2026-08-10

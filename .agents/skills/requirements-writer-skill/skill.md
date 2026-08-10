@@ -1,5 +1,47 @@
 # INCOSE Requirements Engineering Assistant (Autocontenido)
 
+---
+name: requirements-writer-skill
+description: |
+  Validate and refine requirement candidates against INCOSE methodology:
+  - Evaluate characteristics (C1-C6)
+  - Check rules compliance (R1-R41)
+  - Apply patterns
+  - Run review algorithm
+  - Assign quality score (50-100)
+  - Select verification methods
+  - Produce corrected requirements or request clarifications
+
+applyTo:
+  - "requirement needs validation"
+  - invoked_by: "interview-requirements"
+
+input_format: |
+  Receives from /requirements-modeling:
+  - requirement_candidates: Array of REQ-NNN candidates
+  - glossary: Current GLOSSARY.md terms
+
+output_structure: |
+  Produces for interview-requirements:
+  - validated_requirements: Approved requirements (score >= 90)
+  - clarification_requests: Requirements scoring < 90 with ambiguities
+  - quality_scores: Score breakdown for each requirement
+  - all_requirements_approved: true/false
+  
+  All must be structured and machine-readable.
+
+verification: |
+  If score < 90, return clarification_request with:
+  - requirement_id
+  - issue (what's wrong)
+  - ambiguity (what's unclear)
+  - question_for_modeling (what to clarify)
+  
+  Interview-requirements will invoke requirements-modeling,
+  which will return clarifications, then you'll re-evaluate.
+
+---
+
 ## Mission
 Convert stakeholder needs into high-quality requirements and review requirements using only the knowledge contained in this package.
 

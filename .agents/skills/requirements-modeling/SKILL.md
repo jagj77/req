@@ -1,6 +1,40 @@
 ---
 name: requirements-modeling
-description: Build and sharpen a project's requirements model. Use when the user wants to pin down requirements terminology, define a requirements glossary, record architectural decisions, or when another skill needs to maintain the requirements model.
+description: |
+  Formalize and sharpen the requirements model by:
+  - Challenging fuzzy language from grilling output
+  - Creating edge-case scenarios
+  - Updating GLOSSARY.md in real-time
+  - Documenting requirement candidates
+  - Recording architectural decisions (ADRs)
+
+applyTo:
+  - "user wants to pin down terminology"
+  - "user wants to define glossary"
+  - "user wants to record decisions"
+  - invoked_by: "interview-requirements"
+
+input_format: |
+  Receives from /grilling:
+  - articulated_needs
+  - design_decisions
+  - identified_ambiguities
+  - terminology_introduced
+  
+  OR receives from /requirements-writer-skill (feedback loop):
+  - requirement_id: "REQ-NNN"
+  - issue: description of ambiguity
+  - required_clarification: what needs clarifying
+
+output_structure: |
+  Produces for interview-requirements:
+  - glossary_updates: New/updated terms in GLOSSARY.md
+  - requirement_candidates: Array of REQ-NNN candidates
+  - architectural_decisions: Array of ADRs
+  - clarifications_provided: (for feedback loops)
+  
+  All must be structured and machine-readable.
+
 ---
 
 # Requirements Modeling
