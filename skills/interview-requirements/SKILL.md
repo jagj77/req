@@ -123,6 +123,38 @@ Instead, execute automatically in sequence:
    - Propagate: project_slug + language to all phases
    - All output will use: `/req/{project_slug}/requirements-set/` directory structure in detected language
 
+**STEP 0.1: Bootstrap `.req-config.yml` (only if missing)**
+   - Check whether `.req-config.yml` exists at the repo root.
+   - If it exists: read it and continue. Do NOT modify it.
+   - If it does NOT exist: create it at the repo root with the
+     minimal defaults below, then continue. Tell the user:
+     "Created `.req-config.yml` with defaults; edit it to override
+     `default_language`, `language_detection_strategy`, etc."
+   - Minimum defaults (write exactly this content, no extra fields):
+
+     ```yaml
+     default_language: "en"
+     language_detection_strategy: "auto"
+     glossary:
+       centralized: true
+       path: "GLOSSARY.md"
+     requirements:
+       naming_pattern: "REQ-{NNN}"
+       extension: ".md"
+     documentation:
+       summary_file: "requirements-summary.md"
+       structure_file: "requirements-structure.md"
+     validation:
+       minimum_quality_score: 90
+       check_glossary_consistency: true
+       allow_language_mixing: false
+     ```
+
+   - Rationale: `skills.sh` / `npx skills add` does not copy files
+     from the repo root, only files under each skill directory.
+     Without this step, downstream consumers of the pack would have
+     to author `.req-config.yml` manually before first run.
+
 1. **Phase 1: Grilling-requirements** - Extract needs through relentless questioning
    - Invoke: `/grilling-requirements` with project context + project_slug + language
    - Questions asked in: detected language (Spanish or English)
@@ -169,7 +201,6 @@ Instead, execute automatically in sequence:
 **GLOSSARY.md is centralized at /req/GLOSSARY.md (shared by all projects, single language per execution).**
 **Each project uses its own /req/{project_slug}/requirements-set/ directory with single-language files.**
 
----
 
 ## Hard Rules (Non-Negotiable)
 
