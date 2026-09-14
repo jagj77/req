@@ -1,13 +1,6 @@
 ---
 name: requirements-writer-skill
 description: |
-  Validate and refine requirement candidates against INCOSE methodology
----
-# INCOSE Requirements Engineering Assistant (Autocontenido)
-
----
-name: requirements-writer-skill
-description: |
   Validate and refine requirement candidates against INCOSE methodology:
   - Evaluate characteristics (C1-C6)
   - Check rules compliance (R1-R41)
@@ -17,6 +10,10 @@ description: |
   - Select verification methods
   - Produce corrected requirements or request clarifications
   - Use project_slug for all file I/O operations
+---
+
+## Mission
+Convert stakeholder needs into high-quality requirements and review requirements using only the knowledge contained in this package.
 
 applyTo:
   - "requirement needs validation"
@@ -38,7 +35,7 @@ output_structure: |
   - quality_scores: Score breakdown for each requirement
   - all_requirements_approved: true/false
   - directory_operations: Read/Write paths using GLOSSARY.md (root) and {project_slug}/ (language-tagged files)
-  
+
   All must be structured and machine-readable.
 
 file_operations: |
@@ -95,14 +92,9 @@ verification: |
   - question_for_modeling (what to clarify, in specified language)
   - project_slug: [PROPAGATE] For routing
   - language: [PROPAGATE] For response language
-  
+
   Interview-requirements will invoke requirements-modeling,
   which will update GLOSSARY.md (root-level, in specified language), then you'll re-evaluate.
-
----
-
-## Mission
-Convert stakeholder needs into high-quality requirements and review requirements using only the knowledge contained in this package.
 
 ## Definitions
 
@@ -115,7 +107,49 @@ See [Definitions](./definitions.md).
 4. Every review shall produce defects, rationale, and corrections. See [Requirements Review](./review_algorithm.md).
 
 ## Workflow
-Lifecycle Concept -> Need -> Requirement -> Verification -> Validation
+
+Phase 3 (Validation) and Phase 4 (Feedback Loop) of the
+`interview-requirements` orchestrator. Each invocation follows the
+same five steps, looping on any requirement that scores below 90.
+
+1. **Receive input.** Read the `input_format` payload from the
+   orchestrator: `project_slug`, `language` (es|en),
+   `requirement_candidates` (paths under
+   `/req/{project_slug}/requirements-set/REQ-NNN.md`), and the current
+   `/req/GLOSSARY.md` (root-level, centralized, in the specified
+   language).
+2. **Load references.** Read this skill's own reference docs
+   (read-only): `definitions.md`, `requirements-engineering.md`,
+   `characteristics.md`, `rules.md`, `patterns.md`,
+   `review_algorithm.md`, `examples.md`, `glossary_template.md`. Do
+   NOT load sibling skills or any path outside
+   `skills/requirements-writer-skill/` and `/req/`.
+3. **Evaluate each candidate.** For every requirement:
+   - Apply characteristics C1–C6 (`characteristics.md`).
+   - Check rules R1–R41 (`rules.md`).
+   - Match against patterns (`patterns.md`).
+   - Run the review algorithm (`review_algorithm.md`): produce
+     defects, rationale, corrections, and a verification method.
+   - Assign a quality score in the range 50–100.
+4. **Persist results.** Update each
+   `/req/{project_slug}/requirements-set/REQ-NNN.md` with the
+   validation score and any corrections (current language only —
+   never mix es/en in one file).
+5. **Return output.** Produce the `output_structure` payload:
+   - `validated_requirements` — those with score ≥ 90.
+   - `clarification_requests` — those with score < 90; each entry has
+     `requirement_id`, `issue` (current language), `ambiguity`
+     (current language), `question_for_modeling` (current language),
+     `project_slug`, `language`.
+   - `quality_scores` — score breakdown per requirement.
+   - `all_requirements_approved` — boolean.
+   - `project_slug` and `language` — propagated from input for routing.
+
+When `all_requirements_approved` is false, the orchestrator invokes
+`requirements-modeling` to update `GLOSSARY.md`, then re-invokes this
+skill until every requirement scores ≥ 90. This skill MUST NOT update
+`/req/GLOSSARY.md` directly — single-writer ownership belongs to
+`requirements-modeling`.
 
 ## Outputs
 
