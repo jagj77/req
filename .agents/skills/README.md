@@ -1,5 +1,7 @@
 # README.md - Documentación de Skills Integrados
 
+[![skills.sh](https://skills.sh/b/jagj77/req)](https://skills.sh/jagj77/req)
+
 ## 🎯 Propósito
 
 Este repositorio contiene **cinco skills**: cuatro orquestan un workflow end-to-end de **captura, análisis y documentación de requisitos** (basado en INCOSE), y un quinto complementario para refactor seguro de código legacy sin cobertura.
@@ -14,6 +16,26 @@ El usuario inicia con `/interview-requirements` y el agente orquesta automática
 - ✅ **GLOSSARY.md** (root) - Términos formalizados, compartidos por todos los proyectos
 - ✅ **{project_slug}/requirements-set/** - Requisitos validados, scored ≥90
 - ✅ **Trazabilidad completa** - needs → requirements → verification
+
+## 📦 Instalación (via [skills.sh](https://www.skills.sh/))
+
+Este repositorio es un **pack de skills** instalable con el CLI `skills`:
+
+```bash
+# Instalar todos los skills (workflow de requirements + seams-test)
+npx skills add jagj77/req
+
+# Instalar skills específicos del workflow de requirements
+npx skills add jagj77/req --skill interview-requirements --skill grilling-requirements \
+  --skill requirements-modeling --skill requirements-writer-skill
+
+# Solo el skill complementario de refactor seguro
+npx skills add jagj77/req --skill seams-test
+```
+
+Soporta [Claude Code, Codex, Cursor](https://github.com/vercel-labs/skills#readme) y 75+ agentes más. El CLI detecta automáticamente tu agente y configura el skill en consecuencia.
+
+**Workflow mínimo**: instalar los 4 skills de requirements juntos (`interview-requirements` orquesta los otros 3). `seams-test` es independiente — instálalo solo si necesitás refactorizar código sin cobertura.
 
 ---
 

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Requirements Engineering",
+      "description": "INCOSE-based end-to-end workflow to elicit, formalize, and validate software requirements. Tech-stack agnostic — works for backend, frontend, mobile, infra, and embedded. The four skills are orchestrated by interview-requirements and must be installed together for the workflow to function.",
+      "skills": [
+        "interview-requirements",
+        "grilling-requirements",
+        "requirements-modeling",
+        "requirements-writer-skill"
+      ]
+    },
+    {
+      "title": "Refactor Safety",
+      "description": "Complementary skill for safely refactoring legacy code that lacks test coverage. Tech-stack agnostic (Laravel, .NET, Java, Python, Node, COBOL). Not part of the requirements orchestrator — invoke manually when needed.",
+      "skills": [
+        "seams-test"
+      ]
+    }
+  ]
+}
