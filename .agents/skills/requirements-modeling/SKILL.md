@@ -44,10 +44,33 @@ output_structure: |
   All must be structured and machine-readable, in current language.
 
 file_operations: |
-  Create/Update these directories and files:
+  Create/Update ONLY these directories and files:
   - /req/GLOSSARY.md (root-level, centralized, shared by all projects, in current language)
   - /req/{project_slug}/requirements-set/REQ-NNN.md (each requirement, single language)
   - /req/{project_slug}/requirements-set/requirements-summary.md (final, in current language)
+  - /req/{project_slug}/docs/adr/NNNN-*.md (NEW ADRs only)
+
+scope_guard: |
+  Inherited from `interview-requirements` and tech-stack agnostic:
+
+  ALLOWED file outputs (only these):
+    - /req/GLOSSARY.md (root-level, shared)
+    - /req/{slug}/requirements-set/REQ-NNN.md
+    - /req/{slug}/requirements-set/requirements-summary.md
+    - /req/{slug}/docs/adr/NNNN-*.md (new ADRs only)
+
+  FORBIDDEN actions:
+    - Modify any source code, config, build manifest, schema, migration,
+      test file, IaC file, CI config — in any tech stack (Laravel,
+      Django, Rails, Spring, Express, FastAPI, .NET, Go, React, Vue,
+      Angular, Svelte, mobile, infra, embedded, etc.).
+    - Modify docs/, README*, CONTEXT*, or any existing project
+      documentation. Only CREATE new artifacts under
+      /req/{slug}/docs/adr/.
+    - Modify this skill's own SKILL.md or any sibling skill.
+    - Run install / build / migrate / deploy / commit / push.
+
+  lazy_creation: only create a file when you have content for it.
 
 ---
 

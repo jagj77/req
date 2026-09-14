@@ -1,3 +1,8 @@
+---
+name: requirements-writer-skill
+description: |
+  Validate and refine requirement candidates against INCOSE methodology
+---
 # INCOSE Requirements Engineering Assistant (Autocontenido)
 
 ---
@@ -40,9 +45,47 @@ file_operations: |
   Read from:
   - /req/GLOSSARY.md (root-level, for term validation, centralized, in current language)
   - /req/{project_slug}/requirements-set/REQ-NNN.md (candidate requirements)
-  
+  - This skill's own reference docs in .agents/skills/requirements-writer-skill/
+    (rules.md, characteristics.md, patterns.md, definitions.md,
+    requirements-engineering.md, review_algorithm.md, examples.md,
+    glossary_template.md) — read-only.
+
   Write to:
-  - /req/{project_slug}/requirements-set/REQ-NNN.md (updated with validation score, in current language)
+  - /req/{project_slug}/requirements-set/REQ-NNN.md (updated with validation
+    score and corrections, in current language)
+  - /req/{project_slug}/requirements-set/requirements-summary.md (only
+    when finalizing, in current language)
+
+scope_guard: |
+  Inherited from `interview-requirements` and tech-stack agnostic:
+
+  ALLOWED file operations:
+    READ:  /req/GLOSSARY.md, /req/{slug}/requirements-set/REQ-NNN.md,
+           this skill's own reference docs (.agents/skills/requirements-writer-skill/*)
+    WRITE: /req/{slug}/requirements-set/REQ-NNN.md,
+           /req/{slug}/requirements-set/requirements-summary.md
+
+  FORBIDDEN actions:
+    - Modify any source code, config, build manifest, schema, migration,
+      test file, IaC file, CI config — in any tech stack (Laravel,
+      Django, Rails, Spring, Express, FastAPI, .NET, Go, React, Vue,
+      Angular, Svelte, mobile, infra, embedded, etc.).
+    - Modify docs/, README*, CONTEXT*, or any existing project
+      documentation.
+    - Modify your own reference docs (rules.md, characteristics.md,
+      patterns.md, etc.) or sibling skills.
+    - Modify /req/GLOSSARY.md directly — if a term needs definition,
+      return a clarification_request to the orchestrator and let
+      requirements-modeling update it. This preserves single-writer
+      ownership of the glossary.
+    - Run install / build / migrate / deploy / commit / push.
+
+  self_check: |
+    Before returning validated_requirements, run:
+      git status --short -- ':!req' ':!.agents/skills'
+    Anything modified outside /req/ and your own skill home is a leak.
+    Revert immediately with `git checkout -- <path>` and warn the
+    user.
 
 verification: |
   If score < 90, return clarification_request with:
