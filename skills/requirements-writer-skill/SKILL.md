@@ -10,10 +10,6 @@ description: |
   - Select verification methods
   - Produce corrected requirements or request clarifications
   - Use project_slug for all file I/O operations
----
-
-## Mission
-Convert stakeholder needs into high-quality requirements and review requirements using only the knowledge contained in this package.
 
 applyTo:
   - "requirement needs validation"
@@ -95,6 +91,11 @@ verification: |
 
   Interview-requirements will invoke requirements-modeling,
   which will update GLOSSARY.md (root-level, in specified language), then you'll re-evaluate.
+
+---
+
+## Mission
+Convert stakeholder needs into high-quality requirements and review requirements using only the knowledge contained in this package.
 
 ## Definitions
 
