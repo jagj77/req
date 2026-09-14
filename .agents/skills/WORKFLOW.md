@@ -24,6 +24,7 @@ OUTPUT: requirements-set/, GLOSSARY.md, docs/adr/
 | **grilling-requirements** | Entrevista profunda | Contexto | Necesidades+decisiones |
 | **requirements-modeling** | Formaliza modelo | Grilling-requirements output | GLOSSARY+REQ+ADRs |
 | **requirements-writer-skill** | Valida requisitos | REQ candidatos | REQ scored ✅ |
+| **seams-test** 🧰 | Refactor seguro de código sin cobertura (Feathers) | Código legacy | Characterization tests + seams |
 
 ---
 
@@ -269,5 +270,66 @@ Este workflow implementa:
 - ✅ **Traceability** (needs → requirements → verification)
 - ✅ **Configuration management** (GLOSSARY, ADRs)
 - ✅ **Verification methods** (Inspection, Analysis, Demo, Test)
+
+## Contrato de Scope (v3.0)
+
+Los 4 skills de requirements comparten un contrato estricto: **solo
+producen artefactos en `/req/`, nada más**. Esto los hace
+tech-stack agnostic — funcionan igual para Laravel, Django, Rails,
+Spring, Express, FastAPI, .NET, Go, React, Vue, Angular, Svelte,
+mobile, data pipelines, infra, embedded, etc.
+
+### Allowed outputs (únicos)
+
+| Path | Quién | Propósito |
+|---|---|---|
+| `/req/GLOSSARY.md` | modeling (único escritor) | Glosario compartido |
+| `/req/{slug}/requirements-set/REQ-NNN.md` | modeling + writer | Requisitos |
+| `/req/{slug}/requirements-set/requirements-summary.md` | writer (al finalizar) | Resumen ejecutivo |
+| `/req/{slug}/docs/adr/NNNN-*.md` | modeling | ADRs nuevos solamente |
+| `.req-config.yml` | orchestrator | Config a nivel repo |
+
+### Forbidden (en cualquier skill)
+
+- ❌ Tocar código fuente, config, build manifests, schemas,
+  migrations, tests, IaC, CI — en cualquier stack.
+- ❌ Correr install / build / migrate / deploy / lint / format.
+- ❌ `git commit` / `git push` / abrir PR.
+- ❌ Tratar un pedido de implementación como ticket y ejecutarlo
+  ("asigná permisos", "add middleware", "creá un endpoint"). El
+  pedido se re-enmarca como requisito vía `interview-requirements`.
+- ❌ Modificar docs/, README*, CONTEXT* existentes. Solo se CREAN
+  nuevos ADRs.
+
+### Self-check antes de cada transición de fase
+
+```bash
+git status --short -- ':!req' ':!.req-config.yml' ':!.agents/skills'
+```
+
+Cualquier archivo modificado fuera de esos paths es un **leak**.
+Revertir inmediatamente con `git checkout -- <path>` y advertir al
+usuario.
+
+### Reframing: pedidos de implementación → requisitos
+
+`interview-requirements` dispara también ante verbos imperativos
+(asigná/agregá/creá/implementá en español; add/assign/create/implement
+en inglés) seguidos de tech-entities (permiso, rol, ruta, middleware,
+controller, endpoint, columna, tabla, modelo, módulo, funcionalidad).
+En vez de ejecutar, captura la necesidad subyacente como requisito
+ej. `"Asigná X permiso a Y rol"` →
+`"The system SHALL allow [actor] to [action] on [resource] within [scope]."`
+
+### Failure recovery
+
+Si accidentalmente se empezó a tocar código fuente antes de detectar
+el pedido como requisito:
+1. STOP.
+2. `git checkout -- <file>` para cada path tocado fuera de scope.
+3. Avisar al usuario: "Empecé tocando código fuente; debía haberlo
+   capturado como requisito. Revirtiendo y retomando el workflow."
+4. Continuar con STEP 0 (slug + language detection) y Phase 1
+   (grilling-requirements).
 
 Ver [requirements-engineering.md](./requirements-writer-skill/requirements-engineering.md) para detalle.

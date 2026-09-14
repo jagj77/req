@@ -2,7 +2,7 @@
 
 ## 🎯 Propósito
 
-Este repositorio contiene cuatro skills integrados que orquestan un workflow end-to-end de **captura, análisis y documentación de requisitos** basado en la metodología **INCOSE Systems Engineering**.
+Este repositorio contiene **cinco skills**: cuatro orquestan un workflow end-to-end de **captura, análisis y documentación de requisitos** (basado en INCOSE), y un quinto complementario para refactor seguro de código legacy sin cobertura.
 
 El usuario inicia con `/interview-requirements` y el agente orquesta automáticamente:
 1. `/grilling-requirements` - Extrae necesidades (preguntas 1x1)
@@ -59,7 +59,7 @@ El usuario inicia con `/interview-requirements` y el agente orquesta automática
 
 ---
 
-## 🛠️ Los Cuatro Skills (AHORA INTEGRADOS)
+## 🛠️ Los Cinco Skills
 
 ### 1. interview-requirements ⭐ ORQUESTADOR
 **Estado**: ✅ Actualizado para orquestar automáticamente
@@ -119,10 +119,36 @@ Valida y refina:
 ```
 
 📍 Archivo: [requirements-writer-skill/SKILL.md](./requirements-writer-skill/SKILL.md)
+### 5. seams-test 🧰 COMPLEMENTARIO
+**Estado**: ✅ Disponible desde v3.0
+
+**No participa del orquestador de requisitos** — se invoca manualmente
+cuando hay que tocar código sin cobertura. Tech-stack agnostic
+(Laravel, .NET, Java, Python, Node, COBOL, etc.).
+
+```
+Cubre (basado en Michael Feathers, "Working Effectively with Legacy Code"):
+- Árbol de decisión universal para encontrar seams
+- Sprout Method/Class y Wrap Method/Class
+- Scratch Refactoring descartable (rama temporal)
+- Approval Testing (Snapshotting / Golden Master)
+- Characterization tests con aislamiento transaccional
+- Mutation Testing manual como criterio de confianza
+- Pinch points: cubrir el punto de convergencia, no 20 deps
+
+Triggers:
+- "legacy code" / "brownfield" / "no tests for this"
+- "before I refactor" / "safety net" / "seams"
+- "characterization tests" / "golden master"
+- Cualquier refactor / extracción sobre código sin cobertura
+```
+
+📍 Archivo: [seams-test/SKILL.md](./seams-test/SKILL.md)
 
 ---
 
 ## 🔄 Flujo de Ejecución (AUTOMÁTICO)
+
 
 ```
 USER invoca: /interview-requirements "Búsqueda Avanzada"
@@ -330,6 +356,7 @@ Ver [requirements-writer-skill/requirements-engineering.md](./requirements-write
 | grilling-requirements | [✓](./grilling-requirements/SKILL.md) | Preguntas 1x1 | Contexto |
 | requirements-modeling | [✓](./requirements-modeling/SKILL.md) | Formalización | Grilling output |
 | requirements-writer-skill | [✓](./requirements-writer-skill/SKILL.md) | Validación | REQ candidatos |
+| seams-test | [✓](./seams-test/SKILL.md) | Refactor seguro | Código sin cobertura |
 
 ### Para documentación de integración:
 
@@ -337,6 +364,7 @@ Ver [requirements-writer-skill/requirements-engineering.md](./requirements-write
 - [IMPLEMENTATION.md](./IMPLEMENTATION.md) - Guía de cambios en SKILL.md
 - [ORCHESTRATION.md](./ORCHESTRATION.md) - Flujo conceptual
 - [WORKFLOW.md](./WORKFLOW.md) - Guía rápida
+- [seams-test/SKILL.md](./seams-test/SKILL.md) - Teoría de seams + characterization testing
 
 ### Para metodología INCOSE:
 
@@ -384,45 +412,111 @@ PROJECT/REQ/
 
 ---
 
-## 🔑 Cambios Principales desde v1.0
+## 🔑 Cambios Principales
 
-### Versión v2.0 (Actual) - ORQUESTACIÓN FUNCIONAL
+### Versión v3.0 (Actual) — Scope Guards + Reframing + seams-test
+
+Refuerza el contrato "skill de requirements = artefactos en `/req/`
+solo" y agrega el skill complementario `seams-test` para refactor
+seguro.
+
+#### Alcance del cambio
+
+✅ **`interview-requirements/SKILL.md`** — reescritura mayor:
+- Frontmatter con `applyTo` ampliado: dispara también ante pedidos de
+  implementación (`"asigná permisos"`, `"add middleware"`, `"creá endpoint"`).
+- Patterns regex multi-idioma que detectan verbos imperativos + tech-entity
+  y los re-enmarcan como requisitos sin ejecutarlos.
+- Bloque nuevo **"Hard Rules (Non-Negotiable)"**: tabla de outputs
+  permitidos, forbidden actions por tech-stack, tabla de **Trigger
+  detection** con 9 patrones de re-framing (Laravel/Django/Express/etc.),
+  self-check con `git status` antes de cada fase.
+- **Failure recovery**: si accidentalmente empezó a tocar código, revertir
+  con `git checkout -- <file>` y reanudar STEP 0.
+
+✅ **`grilling-requirements/SKILL.md`** — bloque **Scope guard** añadido al
+final (heredado). Define: ✅ read-only tools (`grep`, `codegraph`,
+`read`, `webfetch`, `glob`) y ❌ explícitos (no `edit`/`write` a nada
+fuera de `/req/`, no install/build/commit, no modificar skills).
+
+✅ **`requirements-modeling/SKILL.md`** — `scope_guard` heredado +
+explicitado como tech-stack agnostic; añade `docs/adr/NNNN-*.md` como
+path permitido (ADRs nuevos); regla `lazy_creation` (crear archivos solo
+cuando hay contenido).
+
+✅ **`requirements-writer-skill/SKILL.md`** — frontmatter
+`name`/`description`, paths explícitos de read (incluye su propio home
+read-only), write ampliado a `requirements-summary.md`. `scope_guard`
+con regla crítica: **no modifica `/req/GLOSSARY.md`** — devuelve
+`clarification_request` al orchestrator para preservar
+**single-writer ownership** del glossary. Añade `self_check` con
+`git status`.
+
+✅ **`seams-test/SKILL.md`** (NUEVO, 9.2 KB) — skill complementario,
+tech-stack agnostic (Laravel, .NET, Java, Python, Node, COBOL).
+Cubre el trabajo de Michael Feathers: árbol de decisión universal
+para encontrar seams, Sprout/Wrap, Scratch Refactoring descartable,
+Approval Testing (Snapshotting), Mutation Testing manual, pinch
+points. Triggers: "legacy code", "brownfield", "no tests for this",
+"before I refactor", "safety net", "seams", "characterization tests",
+"golden master". **No participa del orquestador de requisitos** — se
+invoca manualmente cuando hay que tocar código sin cobertura.
+
+#### Contrato unificado (los 4 skills comparten)
+
+```
+ALLOWED file outputs:
+  /req/GLOSSARY.md (root, compartido)
+  /req/{slug}/requirements-set/REQ-NNN.md
+  /req/{slug}/requirements-set/requirements-summary.md
+  /req/{slug}/docs/adr/NNNN-*.md (ADRs nuevos solamente)
+  .req-config.yml (config a nivel repo)
+
+FORBIDDEN actions (cualquier stack):
+  - Tocar código fuente, config, build manifests, schemas,
+    migrations, tests, IaC, CI en cualquier tech stack.
+  - Correr install / build / migrate / deploy / lint / format.
+  - git commit / push / abrir PR.
+  - Tratar un pedido de implementación como ticket y ejecutarlo.
+  - Modificar docs/, README*, CONTEXT* existentes.
+
+Self-check antes de cada transición de fase:
+  git status --short -- ':!req' ':!.req-config.yml' ':!.agents/skills'
+  Cualquier leak → revertir con git checkout -- <path> y advertir.
+```
+
+#### Reframing universal (tech-stack agnostic)
+
+| Pedido literal (ejemplos) | Re-encuadre como requisito |
+|---|---|
+| "Asigná X permiso a Y rol" | "The system SHALL allow [actor] to [action] on [resource] within [scope]." |
+| "Add this middleware/guard" | "The system SHALL restrict access to [endpoint] to users with [roles/conditions]." |
+| "Add a column to table T" | "The system SHALL persist [field] per [entity]." |
+| "Add a field to form F" | "The system SHALL capture [field] during [process]." |
+| "API returns JSON not XML" | "The system SHALL respond to [endpoint] with Content-Type [type]." |
+| "Two-step approval flow" | "The system SHALL require approval from [N] [role] before [action]." |
+| "Expose POST /foo" | "The system SHALL expose POST /foo with the documented request/response contract." |
+| "Filter listing by user's org" | "The system SHALL scope [listing] to records belonging to the user's [org/unit]." |
+| "Send email when X happens" | "The system SHALL notify [recipient] via [channel] when [event] occurs." |
+
+### Versión v2.0 — ORQUESTACIÓN FUNCIONAL
 
 ✅ **interview-requirements/SKILL.md**
-- Ahora especifica invocación automática de otros skills
-- Define fases 1-5
-- Implementa feedback loops
 
 ✅ **grilling-requirements/SKILL.md**
-- Especifica output estructurado
-- Define protocolo de datos
 
 ✅ **requirements-modeling/SKILL.md**
-- Especifica input/output format
-- Lista actividades principales
 
 ✅ **requirements-writer-skill/SKILL.md**
-- Añade frontmatter YAML
-- Especifica input/output format
-- Define feedback loops
 
 ✅ **IMPLEMENTATION.md** (NUEVO)
-- Guía exacta de cambios implementados
-- Valida que los SKILL.md cumplan AGENTS.md
 
----
 
 ## 📖 Más Información
 
-- **WORKFLOW.md** - Guía rápida y cheat sheet
-- **ORCHESTRATION.md** - Flujo detallado y escenario real
-- **AGENTS.md** - Especificación técnica (QUÉ debe pasar)
-- **IMPLEMENTATION.md** - Guía de implementación (CÓMO hacerlo)
-- **README.md** - Este documento (índice)
 
----
 
-**Versión**: 2.0 (Orquestación Funcional)  
-**Basado en**: INCOSE Systems Engineering Handbook v4.0+  
-**Estado**: ✅ COMPLETAMENTE EJECUTABLE  
-**Últimas actualizaciones**: 2026-08-10
+**Versión**: 3.0 (Scope Guards + Reframing + seams-test)
+**Basado en**: INCOSE Systems Engineering Handbook v4.0+
+**Estado**: ✅ COMPLETAMENTE EJECUTABLE
+**Últimas actualizaciones**: 2026-09-14

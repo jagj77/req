@@ -87,3 +87,28 @@ Interview the user relentlessly, asking **ONE question at a time**, **in the spe
    - Signal: "Grilling session complete. Ready for requirements-modeling phase."
 
 **Output must be machine-readable for interview-requirements to process.**
+
+---
+
+## Scope guard (inherited from `interview-requirements`)
+
+This skill produces **structured text output only** — needs, decisions,
+ambiguities, terminology, dependencies, open questions. It does NOT
+create or modify files.
+
+- ✅ Explore the codebase to ask better questions: `grep`, `codegraph`,
+  `read`, `webfetch`, `glob` — all read-only is fine.
+- ❌ Never `edit`/`write`/`create` any source code, config, build
+  manifest, schema, migration, test file, IaC file, CI config, or any
+  non-`/req/` file in **any** tech stack (Laravel, Django, Rails,
+  Spring, Express, FastAPI, .NET, Go, React, Vue, Angular, mobile,
+  infra, embedded, etc.).
+- ❌ Never create files under `/req/` — that's
+  `requirements-modeling`'s job. Keep your output in-memory or in the
+  structured response.
+- ❌ Never run install / build / migrate / deploy / commit / push.
+- ❌ Never modify this skill's own `SKILL.md` or sibling skills.
+
+If the user asks for something out of scope (e.g. "implementá esto
+directamente"), re-frame it as a requirement-elaboration question and
+continue the grilling protocol. Do not execute the request.

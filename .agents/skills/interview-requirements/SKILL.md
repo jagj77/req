@@ -1,18 +1,52 @@
 ---
 name: interview-requirements
 description: |
-  Orchestrate a complete requirements engineering workflow:
-  1. Run /grilling-requirements session to extract stakeholder needs
-  2. Run /requirements-modeling to formalize requirements
-  3. Run /requirements-writer-skill to validate and score
-  4. Handle feedback loops until all requirements >= 90/100
-  5. Produce final deliverable (GLOSSARY.md [shared], project-slug/requirements-set/)
-  6. Support multi-language: Spanish (es) or English (en)
+  Requirements-engineering orchestrator. Use this skill whenever the user
+  describes a need, feature, permission, role, workflow, bug, integration,
+  or any other product change — even when phrased as a direct
+  implementation request.
+
+  Runs a complete requirements workflow:
+    1. /grilling-requirements    — relentless stakeholder interview
+    2. /requirements-modeling   — formalize GLOSSARY.md + REQ-NNN.md
+    3. /requirements-writer-skill — score (≥90/100) and refine
+    4. feedback loops until all requirements approved
+
+  Outputs land in /req/GLOSSARY.md (shared) and
+  /req/{slug}/requirements-set/ (per project).
+
+  HARD RULE: this skill produces requirements artifacts only. It MUST NOT
+  modify application source code, configuration, build manifests, database
+  schemas, or any file outside /req/ and .req-config.yml. The skill is
+  tech-stack agnostic — it works equally well for backend (Laravel,
+  Django, Rails, Spring, Express, FastAPI, .NET, Go, etc.), frontend
+  (React, Vue, Angular, Svelte), mobile, data pipelines, infra, and
+  embedded systems. Even when the user says "implementá X",
+  "asigná este permiso", or "add this middleware", the answer is to
+  capture the underlying need as a requirement — not to execute the
+  change.
 
 applyTo:
-  - "user wants to capture requirements"
-  - "user wants to conduct requirements interview"
+  - "user wants to capture or refine requirements"
+  - "user wants to conduct a requirements interview"
+  - "user describes a need, feature, permission, role, workflow, or bug"
+  - "user asks to add, change, or remove source code, config, schema, or build files"
+  - "user asks for an implementation that the skill should re-frame as a requirement"
+  - user says: "interview requirements"
+  - user says: "requirements interview"
+  - user says: "generar requisitos"
+  - user says: "asigná permisos"
+  - user says: "add middleware"
+  - user says: "creá un endpoint"
+  - user says: "modificá una ruta"
   - pattern: "interview.*requirement"
+  - pattern: "requisit|requirement"
+  # Generic Spanish: imperative verb + tech entity (covers Laravel/Symfony/Django/etc. vocabulary)
+  - pattern: "(asigná|agregá|modificá|cambiá|creá|eliminá|hacé|implementá|agrega|modifica|cambia|crea|elimina|haz|implementa|assign|add|modify|change|create|delete|implement).*(permiso|rol|ruta|middleware|controller|endpoint|route|permission|role|columna|column|campo|field|tabla|table|modelo|model|módulo|module|funcionalidad|feature)"
+  # Catch-all for any "implementá/hacé X" that smells like an implementation request
+  - pattern: "(implementá|implementa|hacé|haz|hazme|please add|please implement).+(en|a|to|in)\\s+(el\\s+sistema|the\\s+system|la\\s+app|the\\s+app)"
+
+disable-model-invocation: false
 
 language_detection: |
   Detect project language from project_name (or read from .req-config.yml default):
@@ -50,6 +84,17 @@ invokes:
     then_loop: "back to requirements-writer-skill"
 
 ---
+
+## Description
+
+  Orchestrate a complete requirements engineering workflow:
+  1. Run /grilling-requirements session to extract stakeholder needs
+  2. Run /requirements-modeling to formalize requirements
+  3. Run /requirements-writer-skill to validate and score
+  4. Handle feedback loops until all requirements >= 90/100
+  5. Produce final deliverable (GLOSSARY.md [shared], project-slug/requirements-set/)
+  6. Support multi-language: Spanish (es) or English (en)
+
 
 ## Orchestration Workflow
 
@@ -108,3 +153,118 @@ Instead, execute automatically in sequence:
 **Never skip phases. Always complete each phase before moving to next.**
 **GLOSSARY.md is centralized at /req/GLOSSARY.md (shared by all projects, single language per execution).**
 **Each project uses its own /req/{project_slug}/requirements-set/ directory with single-language files.**
+
+---
+
+## Hard Rules (Non-Negotiable)
+
+This skill is a **requirements engineering** orchestrator. It produces
+requirement artifacts only. It MUST NOT modify application code,
+configuration files, or any non-requirements file — even when the user
+asks for implementation directly.
+
+### Allowed file outputs (only these)
+
+| Path | Purpose |
+|---|---|
+| `/req/GLOSSARY.md` | Shared glossary (root-level) |
+| `/req/{slug}/requirements-set/REQ-NNN.md` | Per-requirement files |
+| `/req/{slug}/requirements-set/requirements-summary.md` | Final summary |
+| `/req/{slug}/docs/adr/NNNN-*.md` | NEW ADRs only |
+| `.req-config.yml` | Project-level config (at repo root) |
+
+### Forbidden actions
+
+These rules apply to **any** tech stack (Laravel, Symfony, Django,
+Rails, Spring, Express, FastAPI, .NET, Go, React, Vue, Angular,
+Svelte, mobile, data pipelines, infra, embedded, etc.). The skill is
+tech-stack agnostic — it produces requirements, never implementation.
+
+- ❌ Modify any source code, configuration, build manifest, schema,
+  migration, test file, infrastructure-as-code file, or any other
+  non-requirements file. Concretely this includes (non-exhaustive):
+    - Any backend source tree (`app/`, `src/`, `lib/`, `internal/`,
+      `pkg/`, `cmd/`, `services/`, `controllers/`, `models/`,
+      `routes/`, `middleware/`, etc.).
+    - Any frontend source tree (`client/`, `web/`, `ui/`,
+      `components/`, `pages/`, `views/`, `composables/`, etc.).
+    - Any configuration (`config/`, `settings/`, `.env*`,
+      `application.{yml,yaml,properties}`, `appsettings.json`, etc.).
+    - Any package / build manifest (`package.json`, `composer.json`,
+      `requirements.txt`, `pyproject.toml`, `Pipfile`, `pom.xml`,
+      `build.gradle*`, `Cargo.toml`, `go.mod`, `Gemfile`, `*.csproj`,
+      `*.sln`, `pubspec.yaml`, etc.).
+    - Any test tree (`tests/`, `test/`, `__tests__/`, `spec/`,
+      `*.test.*`, `*.spec.*`, etc.).
+    - Any DB schema, migration, ORM model, or seed file.
+    - Any `Dockerfile`, `docker-compose.*`, IaC (`*.tf`, `*.yaml` for
+      k8s/ansible), CI config (`.github/workflows/*`,
+      `.gitlab-ci.yml`, etc.).
+- ❌ Run any install / build / migrate / deploy / lint / format command
+  (`composer require`, `npm install`, `pip install`, `bundle install`,
+  `cargo build`, `dotnet restore`, `artisan migrate`, `rails db:migrate`,
+  `python manage.py migrate`, `npm run build`, `make deploy`,
+  `pnpm i`, `yarn add`, `go mod tidy`, etc.).
+- ❌ Run `git commit`, `git push`, branch creation, or open a PR /
+  MR — those are downstream concerns, not the skill's job.
+- ❌ Treat a user request as an implementation ticket and execute it
+  ("asigná este permiso", "add this middleware", "creá este controller",
+  "add an endpoint POST /foo", "filter this query by org"). The
+  underlying need is a requirement; capture it via the workflow.
+- ❌ Replace or overwrite existing project documentation under
+  `docs/`, `README*`, `CONTEXT*`, or anywhere else outside `/req/`.
+  Only CREATE new artifacts under `/req/{slug}/docs/adr/`.
+
+### Trigger detection: "is this a requirements problem?"
+
+Almost every product/code request is a requirements problem in disguise.
+The re-framing pattern is **tech-stack agnostic** — the examples below
+span multiple stacks (Laravel, Django, Express, generic SQL, frontend
+forms, etc.) to illustrate the universal shape:
+
+`"do X to Y"` → `"The system SHALL [capability] for [actor] under [scope]."`
+
+| User says (literal) | Re-frame as requirement |
+|---|---|
+| "Assign X permission to Y role to view reports" | "The system SHALL allow [actor] to [action] on [resource] within [scope]." |
+| "Add this middleware/guard to route Z" | "The system SHALL restrict access to [endpoint] to users with [roles/conditions]." |
+| "Add a column to table T" | "The system SHALL persist [field] per [entity]." |
+| "Add a field to form F" | "The system SHALL capture [field] during [process]." |
+| "Make the API return JSON instead of XML" | "The system SHALL respond to [endpoint] with Content-Type [type]." |
+| "Implement a two-step approval flow" | "The system SHALL require approval from [N] distinct [role] before [action]." |
+| "Expose POST /foo that takes a JSON body" | "The system SHALL expose POST /foo with the documented request/response contract." |
+| "Filter the listing by the user's organization" | "The system SHALL scope [listing] to records belonging to the user's [org/unit]." |
+| "Send an email when X happens" | "The system SHALL notify [recipient] via [channel] when [event] occurs." |
+
+If you catch yourself reaching for `Edit`/`Write`/`Bash` on a non-`/req/`
+file, STOP. Re-frame the user request as a requirement and continue
+with the workflow.
+
+### Self-check before each phase
+
+Before transitioning from grilling → modeling → writer → consolidation,
+verify no source files were touched by accident:
+
+```bash
+git status --short -- ':!req' ':!.req-config.yml'
+```
+
+If anything outside `/req/` and `.req-config.yml` shows up, revert it
+immediately with `git checkout -- <path>` and warn the user. NEVER
+commit those changes.
+
+---
+
+## Failure recovery
+
+If the skill is invoked but the user already asked for implementation
+in the same turn and the orchestrator started modifying code:
+
+1. STOP executing further edits.
+2. Run `git checkout -- <file>` for every out-of-scope path that was
+   touched.
+3. Acknowledge to the user: "I started touching source code; I should
+   have captured that as a requirement instead. Reverting and resuming
+   the requirements workflow."
+4. Continue with STEP 0 (slug + language detection) and Phase 1
+   (grilling-requirements).
