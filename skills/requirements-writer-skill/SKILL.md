@@ -45,7 +45,7 @@ file_operations: |
   Read from:
   - /req/GLOSSARY.md (root-level, for term validation, centralized, in current language)
   - /req/{project_slug}/requirements-set/REQ-NNN.md (candidate requirements)
-  - This skill's own reference docs in .agents/skills/requirements-writer-skill/
+  - This skill's own reference docs in skills/requirements-writer-skill/
     (rules.md, characteristics.md, patterns.md, definitions.md,
     requirements-engineering.md, review_algorithm.md, examples.md,
     glossary_template.md) — read-only.
@@ -61,7 +61,7 @@ scope_guard: |
 
   ALLOWED file operations:
     READ:  /req/GLOSSARY.md, /req/{slug}/requirements-set/REQ-NNN.md,
-           this skill's own reference docs (.agents/skills/requirements-writer-skill/*)
+           this skill's own reference docs (skills/requirements-writer-skill/*)
     WRITE: /req/{slug}/requirements-set/REQ-NNN.md,
            /req/{slug}/requirements-set/requirements-summary.md
 
@@ -82,7 +82,7 @@ scope_guard: |
 
   self_check: |
     Before returning validated_requirements, run:
-      git status --short -- ':!req' ':!.agents/skills'
+      git status --short -- ':!req' ':!skills'
     Anything modified outside /req/ and your own skill home is a leak.
     Revert immediately with `git checkout -- <path>` and warn the
     user.

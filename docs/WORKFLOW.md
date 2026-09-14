@@ -253,10 +253,10 @@ Abrir: REQ/docs/adr/
 
 - [ORCHESTRATION.md](./ORCHESTRATION.md) - Flujo conceptual detallado
 - [AGENTS.md](./AGENTS.md) - Configuración técnica y protocolos
-- [requirements-writer-skill/SKILL.md](./requirements-writer-skill/SKILL.md) - Validación
-- [requirements-writer-skill/characteristics.md](./requirements-writer-skill/characteristics.md) - C1-C6
-- [requirements-writer-skill/rules.md](./requirements-writer-skill/rules.md) - R1-R41
-- [requirements-writer-skill/review_algorithm.md](./requirements-writer-skill/review_algorithm.md) - Algoritmo
+- [requirements-writer-skill/SKILL.md](../skills/requirements-writer-skill/SKILL.md) - Validación
+- [requirements-writer-skill/characteristics.md](../skills/requirements-writer-skill/characteristics.md) - C1-C6
+- [requirements-writer-skill/rules.md](../skills/requirements-writer-skill/rules.md) - R1-R41
+- [requirements-writer-skill/review_algorithm.md](../skills/requirements-writer-skill/review_algorithm.md) - Algoritmo
 
 ---
 
@@ -304,7 +304,7 @@ mobile, data pipelines, infra, embedded, etc.
 ### Self-check antes de cada transición de fase
 
 ```bash
-git status --short -- ':!req' ':!.req-config.yml' ':!.agents/skills'
+git status --short -- ':!req' ':!.req-config.yml' ':!skills'
 ```
 
 Cualquier archivo modificado fuera de esos paths es un **leak**.
@@ -332,4 +332,4 @@ el pedido como requisito:
 4. Continuar con STEP 0 (slug + language detection) y Phase 1
    (grilling-requirements).
 
-Ver [requirements-engineering.md](./requirements-writer-skill/requirements-engineering.md) para detalle.
+Ver [requirements-engineering.md](../skills/requirements-writer-skill/requirements-engineering.md) para detalle.
