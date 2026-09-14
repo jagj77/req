@@ -44,7 +44,22 @@ applyTo:
   # Generic Spanish: imperative verb + tech entity (covers Laravel/Symfony/Django/etc. vocabulary)
   - pattern: "(asigná|agregá|modificá|cambiá|creá|eliminá|hacé|implementá|agrega|modifica|cambia|crea|elimina|haz|implementa|assign|add|modify|change|create|delete|implement).*(permiso|rol|ruta|middleware|controller|endpoint|route|permission|role|columna|column|campo|field|tabla|table|modelo|model|módulo|module|funcionalidad|feature)"
   # Catch-all for any "implementá/hacé X" that smells like an implementation request
-  - pattern: "(implementá|implementa|hacé|haz|hazme|please add|please implement).+(en|a|to|in)\\s+(el\\s+sistema|the\\s+system|la\\s+app|the\\s+app)"
+  - pattern: "(implementá|implementa|hacé|haz|hazme|please add|please implement).+(en|a|to|in)\\s+(el\\s+sistema|the\\s+system|la\s+app|the\\s+app)"
+
+required_companions:
+  - grilling-requirements
+  - requirements-modeling
+  - requirements-writer-skill
+optional_companions:
+  - seams-test
+
+compatibility: |
+  This skill is an orchestrator — it does not work standalone.
+  REQUIRED companion skills (must be installed together): grilling-requirements,
+  requirements-modeling, requirements-writer-skill. Without them, Phase 1
+  (interview), Phase 2 (formalization), and Phase 3 (validation) fail.
+  OPTIONAL: seams-test (only for refactoring legacy code without coverage).
+  Install the full workflow pack: `npx skills add jagj77/req`.
 
 disable-model-invocation: false
 
