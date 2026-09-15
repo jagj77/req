@@ -102,20 +102,33 @@ EVALUACIÓN:
 - R1-R41: ✅ Cumple
 - Score: 95/100
 
-✍️ REQ-001-search-performance.md (final)
   • Requirement validated
   • Verification: Automated test
   • Quality: 95/100
   • Ready for design
 ```
 
+**Hard Check 0 (gate automático)** — antes del score, el linter
+`scripts/lint-requirement.py` se ejecuta y exige:
+- Un único `SHALL` (case-sensitive) en la sección `## Rule`.
+- `project_slug` y `language` presentes en el front-matter.
+- Todos los `[términos]` del rule referenciados en `GLOSSARY.md`.
+- `score ∈ [50, 100]`.
+
+Si el linter falla, el requisito scorea **0** y el skill devuelve un
+`clarification_request` con el detalle — sin evaluar C1–C6 ni R1–R41.
+Si Python no está disponible, el skill degrada con un
+`clarification_request` accionable ("install Python 3.8+") — no
+scorea 0 por entorno roto.
+
+
 ### Paso 5️⃣ : Completación
 
-```
+
 ✅ GLOSSARY.md completo
 ✅ REQ-001, REQ-002, REQ-003 finales
 ✅ ADRs documentados
-✅ Traceabilidad completa
+✅ Trazabilidad completa
 ✅ Listo para diseño y desarrollo
 ```
 
@@ -216,6 +229,7 @@ Abrir: REQ/docs/adr/
 | **ADR** | Architectural Decision Record |
 | **C1-C6** | Características de buen requisito |
 | **R1-R41** | Reglas de formato de requisito |
+| **Hard Check 0** | Linter obligatorio antes de scoring — un único `SHALL`, front-matter válido, glosario OK |
 | **Score 90+** | Requisito listo para diseño |
 
 ---
@@ -257,6 +271,8 @@ Abrir: REQ/docs/adr/
 - [requirements-writer-skill/characteristics.md](../skills/requirements-writer-skill/characteristics.md) - C1-C6
 - [requirements-writer-skill/rules.md](../skills/requirements-writer-skill/rules.md) - R1-R41
 - [requirements-writer-skill/review_algorithm.md](../skills/requirements-writer-skill/review_algorithm.md) - Algoritmo
+- [requirements-writer-skill/templates/REQ-template.md](../skills/requirements-writer-skill/templates/REQ-template.md) - Plantilla canónica de REQ
+- [requirements-writer-skill/scripts/lint-requirement.py](../skills/requirements-writer-skill/scripts/lint-requirement.py) - Linter Hard Check 0
 
 ---
 
