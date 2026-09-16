@@ -46,6 +46,21 @@ applyTo:
   # Catch-all for any "implementá/hacé X" that smells like an implementation request
   - pattern: "(implementá|implementa|hacé|haz|hazme|please add|please implement).+(en|a|to|in)\\s+(el\\s+sistema|the\\s+system|la\\s+app|the\\s+app)"
 
+required_companions:
+  - grilling-requirements
+  - requirements-modeling
+  - requirements-writer-skill
+optional_companions:
+  - seams-test
+
+compatibility: |
+  This skill is an orchestrator — it does not work standalone.
+  REQUIRED companion skills (must be installed together): grilling-requirements,
+  requirements-modeling, requirements-writer-skill. Without them, Phase 1
+  (interview), Phase 2 (formalization), and Phase 3 (validation) fail.
+  OPTIONAL: seams-test (only for refactoring legacy code without coverage).
+  Install the full workflow pack: `npx skills add jagj77/req`.
+
 disable-model-invocation: false
 
 language_detection: |
@@ -68,20 +83,52 @@ invokes:
   - skill: grilling-requirements
     with_context: [project_name, project_slug, stakeholders, scope, language]
     expect_output: grilling_requirements_output (needs, decisions, ambiguities, terminology, project_slug, language)
-  
+
   - skill: requirements-modeling
     with_input: [grilling_requirements_output, project_slug, language]
+    with_contract: requirements_writer_template_v1
     expect_output: modeling_output (glossary, requirement_candidates, project_slug, language)
-  
+
   - skill: requirements-writer-skill
     with_input: [requirement_candidates, glossary, project_slug, language]
     expect_output: validation_output (validated_requirements, clarification_requests, quality_scores, project_slug, language)
-  
+
   - skill: requirements-modeling
     when: "validation_output.any_score < 90"
     type: "feedback_loop"
     with_input: [clarification_request, project_slug, language]
     then_loop: "back to requirements-writer-skill"
+
+# Forwarded to /requirements-modeling so it produces REQ files that already
+# satisfy the writer's linter on the first draft. Without this contract,
+# /requirements-modeling writes in freeform prose and the writer skill
+# rewrites every file in the feedback loop (waste of cycles).
+contracts:
+  requirements_writer_template_v1:
+    frontmatter:
+      required_fields: [id, project_slug, language, validated_by, validated_at, score, approved]
+      id_format: "REQ-{NNN}"
+      validated_by_default: "requirements-writer-skill"
+      validated_at_default: null
+      score_default: null
+      approved_default: false
+    sections_required: ["Meta", "Rule", "Rationale", "Glossary Terms Used", "Clauses", "Validation"]
+    rule_section:
+      shall_count: 1
+      single_observable_obligation: true
+      avoid_combinators: true
+      solution_free: true
+      bracketed_terms:
+        must_match_glossary_exactly: true
+        no_invented_tokens: true
+        example_canonical: "[Vista V_INFORME_EMITIDO]"
+        example_code_to_avoid: "<schema>.<table_or_view>"
+    clauses_section:
+      sub_clause_format: "REQ-{NNN}.{M}"
+      carries: [acceptance_criteria, file_paths, helper_names, library_choices, bem_tokens, tests]
+    validation_section:
+      populated_by: "requirements-writer-skill"
+      placeholders_until_phase_3: [score, approved, rules_violated, corrections_applied]
 
 ---
 
@@ -108,6 +155,38 @@ Instead, execute automatically in sequence:
    - Propagate: project_slug + language to all phases
    - All output will use: `/req/{project_slug}/requirements-set/` directory structure in detected language
 
+**STEP 0.1: Bootstrap `.req-config.yml` (only if missing)**
+   - Check whether `.req-config.yml` exists at the repo root.
+   - If it exists: read it and continue. Do NOT modify it.
+   - If it does NOT exist: create it at the repo root with the
+     minimal defaults below, then continue. Tell the user:
+     "Created `.req-config.yml` with defaults; edit it to override
+     `default_language`, `language_detection_strategy`, etc."
+   - Minimum defaults (write exactly this content, no extra fields):
+
+     ```yaml
+     default_language: "en"
+     language_detection_strategy: "auto"
+     glossary:
+       centralized: true
+       path: "GLOSSARY.md"
+     requirements:
+       naming_pattern: "REQ-{NNN}"
+       extension: ".md"
+     documentation:
+       summary_file: "requirements-summary.md"
+       structure_file: "requirements-structure.md"
+     validation:
+       minimum_quality_score: 90
+       check_glossary_consistency: true
+       allow_language_mixing: false
+     ```
+
+   - Rationale: `skills.sh` / `npx skills add` does not copy files
+     from the repo root, only files under each skill directory.
+     Without this step, downstream consumers of the pack would have
+     to author `.req-config.yml` manually before first run.
+
 1. **Phase 1: Grilling-requirements** - Extract needs through relentless questioning
    - Invoke: `/grilling-requirements` with project context + project_slug + language
    - Questions asked in: detected language (Spanish or English)
@@ -123,12 +202,68 @@ Instead, execute automatically in sequence:
    - Collect: GLOSSARY updates, requirement candidates, in specified language
    - Ensure: no contradictions between requirements
 
+   **2.1 Phase Template Contract (MANDATORY).** Every REQ file generated in this phase MUST
+   already comply with the writer skill's `## Rule` template — the linter's Hard Check 0
+   is the contract, not a target to retrofit later. The required structure is:
+
+   ```yaml
+   ---
+   id: REQ-{NNN}                     # matches filename REQ-NNN-{slug}.md
+   project_slug: {project_slug}
+   language: es | en                 # detected by Phase 0
+   validated_by: requirements-writer-skill
+   validated_at: null               # populated in Phase 3
+   score: null                      # populated in Phase 3
+   approved: false                  # flipped to true in Phase 3
+   ---
+   ```
+
+   - `## Meta` — `requirement_id`, `project_slug`, `language`, `verification_method`.
+   - `## Rule` — EXACTLY ONE `SHALL` sentence. State the observable behavior in plain
+     prose; do NOT bundle multiple obligations with `y`. Do NOT name helper functions,
+     library names, file paths, exact JSON keys, or BEM tokens inside `## Rule` — those
+     belong in `## Clauses`. Every `[bracketed]` token MUST match an entry in
+     `/req/GLOSSARY.md` exactly (use `[Rol REPORTE]`, never `Role::REPORTE`; use
+     `[Vista V_INFORME_EMITIDO]`, never the raw `<schema>.<view>` glyph).
+   - `## Rationale` — short justification (3-5 sentences) of why this approach.
+   - `## Glossary Terms Used` — list of `[bracketed]` terms referenced in `## Rule`.
+   - `## Clauses` — sub-clauses `REQ-NNN.M` carrying acceptance criteria, file paths,
+     helper names, library choices, BEM tokens, tests, etc. (the "how").
+   - `## Validation` — leave `score`, `approved`, `rules_violated`, `corrections_applied`
+     as placeholders; Phase 3 populates them.
+
+   **2.2 Hard Check 0 quality gate (MANDATORY before Phase 3).** Before transitioning
+   to Phase 3, run `python .agents/skills/requirements-writer-skill/scripts/lint-requirement.py
+   /req/{slug}/requirements-set/REQ-NNN-{slug}.md` on every REQ. If Hard Check 0
+   fails (missing front-matter, multiple SHALLs, bracketed terms not in GLOSSARY,
+   malformed meta block), Phase 2 MUST re-write the REQ before Phase 3 starts.
+   Re-writing is the responsibility of `/requirements-modeling`, not the writer.
+   Phase 3 (writer) only scores C1-C9 + R1-R41; it MUST NOT be the place where the
+   template is fixed.
+
+   **2.3 One sub-requirement per file.** A REQ is one observable obligation in
+   `## Rule`. Sub-clauses (`## Clauses`) carry the detail. If a candidate
+   requirement bundles multiple observable obligations, split it into multiple
+   REQ-NNN files in this phase — do not defer to Phase 3.
+
+   **2.4 Use of `[bracketed]` glossary references (HINT).** When drafting `## Rule`,
+   run `grep -E '^\| \[' /req/GLOSSARY.md | awk -F'|' '{print $2}'` first to list
+   every canonical term. Copy the exact spelling from the table — including
+   parentheses, accents, and suffixes like `(existente)`, `(vista Ciclo de Auditoría)`.
+   Do not invent bracketed tokens that are not in the glossary.
+
 3. **Phase 3: Validation** - Score and verify
    - Invoke: `/requirements-writer-skill` with requirement candidates + project_slug + language
    - Read: `/req/GLOSSARY.md` (centralized, root-level, in detected language)
    - Check: all requirements scored >= 90/100
    - Feedback messages in: detected language
    - If any score < 90: Identify ambiguities
+
+   **3.1 Phase 3 assumes Phase 2 template contract is satisfied.** The writer skill
+   scores substance (C1-C9 + R1-R41). If Hard Check 0 fails at this point, the
+   orchestrator MUST return to Phase 2 to fix the template, not invoke the writer
+   in a loop. The writer only re-scores; it MUST NOT silently rewrite `## Rule` to
+   bypass the gate.
 
 4. **Phase 4: Feedback Loops** - Iterate on low scores
    - For each requirement scored < 90:
@@ -154,7 +289,30 @@ Instead, execute automatically in sequence:
 **GLOSSARY.md is centralized at /req/GLOSSARY.md (shared by all projects, single language per execution).**
 **Each project uses its own /req/{project_slug}/requirements-set/ directory with single-language files.**
 
----
+### Backward compatibility & legacy grandfathering
+
+The Phase 2 Template Contract and the Hard Check 0 quality gate apply **forward only**,
+starting from the next run of this skill. They MUST NOT be retroactively enforced on
+existing validated projects.
+
+Concretely:
+
+- A REQ file is **legacy** when its filename matches one of these existing patterns
+  AND it predates this version of the skill (or carries no `validated_by` front-matter
+  field):
+  - `req/{slug}/requirements-set/REQ-NNN-{slug}.md` without `## Rule` section
+  - `req/{slug}/requirements-set/REQ-NNN-{slug}.md` with multi-clause `REQ-NNN.M`
+    sub-sections but no YAML front-matter
+- The `/requirements-writer-skill` MUST be invoked on legacy REQs only if the user
+  explicitly requests re-validation. By default the orchestrator treats legacy REQs
+  as **grandfathered** — already approved, do not re-lint, do not break the build.
+- New sub-requirements added to a legacy project MAY mix styles: new files use the
+  template contract, old files keep their format. The `requirements-summary.md` for
+  that project MUST declare which REQs are legacy vs templated.
+- If the user explicitly asks to migrate a legacy project to the new template, that
+  is a separate change and MUST be tracked as such in the summary (do not silently
+  rewrite).
+
 
 ## Hard Rules (Non-Negotiable)
 
