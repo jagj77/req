@@ -727,9 +727,69 @@ interview-requirements orquesta automáticamente:
   → Captura output JSON
   → Invoca /requirements-writer-skill CON requirement_candidates
   → Si score < 90: Feedback loop
-  → Consolida deliverable final
-  ↓
-✅ Entrega: GLOSSARY.md, requirements-set/, docs/adr/
+  → Si score ≥ 90: APROBADO
+  → Consolida summary.md
 ```
 
-**AGENTS.md especifica QUÉ debe pasar. IMPLEMENTATION.md especifica CÓMO. Este documento (IMPLEMENTATION.md) es el puente.**
+---
+
+## CAMBIO 5: Hard Check 0 — Linter obligatorio en `requirements-writer-skill`
+
+### Contexto
+Antes del patch, el skill puntuaba REQs sin enforcement automático: el modelo
+se auto-asignaba 100/100 sin manera de verificarlo. Esto permitía requisitos
+con 5 SHALLos en una sola oración (violación R18), prosa en vez de payload
+estructurado, y `project_slug`/`language` no propagados al front-matter.
+
+### Archivos nuevos en el skill
+- `templates/REQ-template.md` — plantilla canónica con front-matter y secciones
+  fijas (`## Meta`, `## Rule`, `## Rationale`, `## Criteria`, `## Glossary Terms Used`,
+  `## Validation`).
+- `scripts/lint-requirement.py` — linter ejecutable. Exit 0 = cumple, exit 1 =
+  violaciones a stderr.
+
+### Reglas que enforza el linter
+1. Front-matter YAML presente, con `project_slug` y `language` no vacíos.
+2. Sección `## Rule` con **exactamente 1** `SHALL` (case-sensitive).
+3. `score ∈ [50, 100]` cuando está presente en el front-matter.
+4. Todos los `[términos]` del rule referenciados en `/req/GLOSSARY.md`
+   (relativo: tres niveles arriba desde el archivo REQ).
+
+### SKILL.md — flujo modificado (paso 3a y 3b)
+```
+3a. **Python availability pre-check.** Antes de invocar el linter:
+      command -v python3 || command -v python || command -v py
+    Si ninguno está disponible, devolver `clarification_request` con
+    issue="Linter unavailable: Python 3.8+ required…" y
+    question_for_modeling="Install Python 3.8+ and re-invoke…".
+    NO scorear 0 (eso enmascararía un problema de entorno).
+
+3b. **Hard Check 0 — Single SHALL.** Ejecutar:
+      python scripts/lint-requirement.py /req/{slug}/requirements-set/REQ-NNN.md
+    Si falla, score=0 y `clarification_request` con la salida del linter.
+```
+
+### Cómo aplicarlo (manual, ~2 min)
+1. Backup: `cp SKILL.md SKILL.md.bak`
+2. Diff: `diff <skill-home>/SKILL.md <patch>/SKILL.md`
+3. Reemplazar `SKILL.md`.
+4. `mkdir templates scripts` y copiar los 2 archivos nuevos.
+5. Validar: `python scripts/lint-requirement.py <REQ-001.md>` debe
+   fallar en REQs existentes (esperado — necesitan refactor) y pasar
+   en REQs nuevos derivados del template.
+
+### Reversión
+`move SKILL.md.bak SKILL.md` + `rmdir /S /Q templates scripts`.
+
+### Acceptance criteria
+- [ ] SKILL.md compila (YAML frontmatter válido, secciones 1-2-3-3a-3b-4-5).
+- [ ] Linter corre contra REQ-001 actual y reporta violación.
+- [ ] Linter corre contra REQ derivado del template y exit code = 0.
+- [ ] Template se puede copiar a un nuevo `REQ-002.md` sin ajustes.
+
+### Riesgo conocido
+Requisitos pre-existentes con >1 SHALL fallarán el linter. Decisión
+consciente: enforzar atomicidad a costa de refactor. Si se rechaza,
+mantener R18 solo como guidance (sin Hard Check 0) y conservar el
+linter como opcional (sólo avisa, no rechaza).
+

@@ -41,7 +41,7 @@ output_structure: |
   /req/
   ├── .req-config.yml (this file)
   ├── GLOSSARY.md (centralized, in configured/detected language, NO SUFFIX)
-  ├── .agents/skills/templates/
+  ├── skills/templates/
   │   ├── REQ-NNN.md (Spanish reference template)
   │   ├── REQ-NNN-en.md (English reference template)
   │   ├── GLOSSARY.md (Spanish reference template)

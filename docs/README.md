@@ -1,5 +1,7 @@
 # README.md - Documentación de Skills Integrados
 
+[![skills.sh](https://skills.sh/b/jagj77/req)](https://skills.sh/jagj77/req)
+
 ## 🎯 Propósito
 
 Este repositorio contiene **cinco skills**: cuatro orquestan un workflow end-to-end de **captura, análisis y documentación de requisitos** (basado en INCOSE), y un quinto complementario para refactor seguro de código legacy sin cobertura.
@@ -14,6 +16,26 @@ El usuario inicia con `/interview-requirements` y el agente orquesta automática
 - ✅ **GLOSSARY.md** (root) - Términos formalizados, compartidos por todos los proyectos
 - ✅ **{project_slug}/requirements-set/** - Requisitos validados, scored ≥90
 - ✅ **Trazabilidad completa** - needs → requirements → verification
+
+## 📦 Instalación (via [skills.sh](https://www.skills.sh/))
+
+Este repositorio es un **pack de skills** instalable con el CLI `skills`:
+
+```bash
+# Instalar todos los skills (workflow de requirements + seams-test)
+npx skills add jagj77/req
+
+# Instalar skills específicos del workflow de requirements
+npx skills add jagj77/req --skill interview-requirements --skill grilling-requirements \
+  --skill requirements-modeling --skill requirements-writer-skill
+
+# Solo el skill complementario de refactor seguro
+npx skills add jagj77/req --skill seams-test
+```
+
+Soporta [Claude Code, Codex, Cursor](https://github.com/vercel-labs/skills#readme) y 75+ agentes más. El CLI detecta automáticamente tu agente y configura el skill en consecuencia.
+
+**Workflow mínimo**: instalar los 4 skills de requirements juntos (`interview-requirements` orquesta los otros 3). `seams-test` es independiente — instálalo solo si necesitás refactorizar código sin cobertura.
 
 ---
 
@@ -52,7 +74,7 @@ El usuario inicia con `/interview-requirements` y el agente orquesta automática
 
 ### NIVEL 4: Metodología Base
 
-**[requirements-writer-skill/requirements-engineering.md](./requirements-writer-skill/requirements-engineering.md)**
+**[requirements-writer-skill/requirements-engineering.md](../skills/requirements-writer-skill/requirements-engineering.md)**
 - 7 Principios INCOSE
 - Lifecycle phases
 - Conexión con otros archivos
@@ -73,7 +95,7 @@ Invoca automáticamente:
 5. Consolida deliverable final
 ```
 
-📍 Archivo: [interview-requirements/SKILL.md](./interview-requirements/SKILL.md)
+📍 Archivo: [interview-requirements/SKILL.md](../skills/interview-requirements/SKILL.md)
 
 ### 2. grilling-requirements
 **Estado**: ✅ Actualizado para output estructurado
@@ -87,7 +109,7 @@ Extrae mediante cuestionamiento:
 - dependencies_identified
 ```
 
-📍 Archivo: [grilling-requirements/SKILL.md](./grilling-requirements/SKILL.md)
+📍 Archivo: [grilling-requirements/SKILL.md](../skills/grilling-requirements/SKILL.md)
 
 ### 3. requirements-modeling
 **Estado**: ✅ Actualizado para input/output estructurado
@@ -102,7 +124,7 @@ Formaliza y estructura:
 - Retorna datos estructurados para interview-requirements
 ```
 
-📍 Archivo: [requirements-modeling/SKILL.md](./requirements-modeling/SKILL.md)
+📍 Archivo: [requirements-modeling/SKILL.md](../skills/requirements-modeling/SKILL.md)
 
 ### 4. requirements-writer-skill
 **Estado**: ✅ Actualizado para validación + feedback loops
@@ -118,7 +140,7 @@ Valida y refina:
 - Si score < 90: retorna clarification_request
 ```
 
-📍 Archivo: [requirements-writer-skill/SKILL.md](./requirements-writer-skill/SKILL.md)
+📍 Archivo: [requirements-writer-skill/SKILL.md](../skills/requirements-writer-skill/SKILL.md)
 ### 5. seams-test 🧰 COMPLEMENTARIO
 **Estado**: ✅ Disponible desde v3.0
 
@@ -143,7 +165,7 @@ Triggers:
 - Cualquier refactor / extracción sobre código sin cobertura
 ```
 
-📍 Archivo: [seams-test/SKILL.md](./seams-test/SKILL.md)
+📍 Archivo: [seams-test/SKILL.md](../skills/seams-test/SKILL.md)
 
 ---
 
@@ -309,7 +331,7 @@ Este workflow implementa:
 - Iterative refinement
 - Continuous validation
 
-Ver [requirements-writer-skill/requirements-engineering.md](./requirements-writer-skill/requirements-engineering.md) para detalle.
+Ver [requirements-writer-skill/requirements-engineering.md](../skills/requirements-writer-skill/requirements-engineering.md) para detalle.
 
 ---
 
@@ -352,11 +374,11 @@ Ver [requirements-writer-skill/requirements-engineering.md](./requirements-write
 
 | Skill | SKILL.md | Detalles | Entrada |
 |-------|----------|---------|---------|
-| interview-requirements | [✓](./interview-requirements/SKILL.md) | Orquestación | Descripción proyecto |
-| grilling-requirements | [✓](./grilling-requirements/SKILL.md) | Preguntas 1x1 | Contexto |
-| requirements-modeling | [✓](./requirements-modeling/SKILL.md) | Formalización | Grilling output |
-| requirements-writer-skill | [✓](./requirements-writer-skill/SKILL.md) | Validación | REQ candidatos |
-| seams-test | [✓](./seams-test/SKILL.md) | Refactor seguro | Código sin cobertura |
+| interview-requirements | [✓](../skills/interview-requirements/SKILL.md) | Orquestación | Descripción proyecto |
+| grilling-requirements | [✓](../skills/grilling-requirements/SKILL.md) | Preguntas 1x1 | Contexto |
+| requirements-modeling | [✓](../skills/requirements-modeling/SKILL.md) | Formalización | Grilling output |
+| requirements-writer-skill | [✓](../skills/requirements-writer-skill/SKILL.md) | Validación | REQ candidatos |
+| seams-test | [✓](../skills/seams-test/SKILL.md) | Refactor seguro | Código sin cobertura |
 
 ### Para documentación de integración:
 
@@ -364,20 +386,20 @@ Ver [requirements-writer-skill/requirements-engineering.md](./requirements-write
 - [IMPLEMENTATION.md](./IMPLEMENTATION.md) - Guía de cambios en SKILL.md
 - [ORCHESTRATION.md](./ORCHESTRATION.md) - Flujo conceptual
 - [WORKFLOW.md](./WORKFLOW.md) - Guía rápida
-- [seams-test/SKILL.md](./seams-test/SKILL.md) - Teoría de seams + characterization testing
+- [seams-test/SKILL.md](../skills/seams-test/SKILL.md) - Teoría de seams + characterization testing
 
 ### Para metodología INCOSE:
 
-- [requirements-engineering.md](./requirements-writer-skill/requirements-engineering.md) - Principios base
-- [characteristics.md](./requirements-writer-skill/characteristics.md) - Criterios C1-C6
-- [rules.md](./requirements-writer-skill/rules.md) - Reglas R1-R41
-- [definitions.md](./requirements-writer-skill/definitions.md) - Terminología
-- [review_algorithm.md](./requirements-writer-skill/review_algorithm.md) - Algoritmo de validación
+- [requirements-engineering.md](../skills/requirements-writer-skill/requirements-engineering.md) - Principios base
+- [characteristics.md](../skills/requirements-writer-skill/characteristics.md) - Criterios C1-C6
+- [rules.md](../skills/requirements-writer-skill/rules.md) - Reglas R1-R41
+- [definitions.md](../skills/requirements-writer-skill/definitions.md) - Terminología
+- [review_algorithm.md](../skills/requirements-writer-skill/review_algorithm.md) - Algoritmo de validación
 
 ### Para patrones y ejemplos:
 
-- [patterns.md](./requirements-writer-skill/patterns.md) - Estructuras de requisitos
-- [examples.md](./requirements-writer-skill/examples.md) - Ejemplos buenos/malos
+- [patterns.md](../skills/requirements-writer-skill/patterns.md) - Estructuras de requisitos
+- [examples.md](../skills/requirements-writer-skill/examples.md) - Ejemplos buenos/malos
 
 ---
 
@@ -481,7 +503,7 @@ FORBIDDEN actions (cualquier stack):
   - Modificar docs/, README*, CONTEXT* existentes.
 
 Self-check antes de cada transición de fase:
-  git status --short -- ':!req' ':!.req-config.yml' ':!.agents/skills'
+git status --short -- ':!req' ':!.req-config.yml' ':!skills'
   Cualquier leak → revertir con git checkout -- <path> y advertir.
 ```
 

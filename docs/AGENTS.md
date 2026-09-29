@@ -92,6 +92,9 @@ Run a comprehensive requirements elicitation and formalization session:
 
 4. Validate with /requirements-writer-skill
    - Input: Requirement candidates from requirements-modeling
+   - Activity: **Hard Check 0** — run `scripts/lint-requirement.py` on each
+     candidate (Python 3.8+ must be available; if not, request clarification
+     rather than scoring 0)
    - Activity: Evaluate C1-C6 characteristics
    - Activity: Check R1-R41 rules
    - Activity: Apply patterns
@@ -159,16 +162,18 @@ INPUT from requirements-modeling:
   • architectural_decisions: [ADRs created]
 
 INSTRUCTION to requirements-writer-skill:
-  "Validate these requirement candidates:
-   
+  "Validate these requirement candidates. Before scoring each one,
+   the skill MUST run Hard Check 0 (lint-requirement.py) on the file.
+   Files failing the linter score 0 and produce a clarification_request
+   without evaluating C1-C6 or R1-R41 — see Hard Check 0 in
+   requirements-writer-skill/SKILL.md for details.
+
    For each candidate:
    1. Evaluate against C1-C6 characteristics
    2. Check compliance with R1-R41 rules
    3. Match against patterns
    4. Apply review_algorithm
    5. Assign quality score
-   6. Define verification method
-   7. Produce corrected version
    
    Provide output in this format:
    
