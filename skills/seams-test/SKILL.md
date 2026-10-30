@@ -68,20 +68,58 @@ A characterization test (golden master test) does not validate what the code *sh
 
 Universal checklist:
 - [ ] The test name indicates it describes current behavior (`_CurrentBehavior`, `_golden`).
-- [ ] All non-determinism is frozen (time, random, IDs, UUIDs, collection ordering).
+- [ ] All non-determinism is frozen (time, random, generated identifiers, collection ordering) — but only the part that is *freezable*. See "What to freeze, and what not to" below.
 - [ ] **Transactional isolation:** If the DB could not be mocked, the entire test MUST run inside a transaction that forces a `ROLLBACK` in `teardown`, guaranteeing a constant clean state.
 - [ ] Every decision path and every side effect (persistence, fired events) is covered.
 - [ ] Bugs found are commented with `// BUG:`, not fixed.
+- [ ] Every uncovered decision path was reviewed and either exercised and frozen, or proven unreachable and documented — not merely left in the report.
+
+## What to freeze, and what not to
+
+A golden master freezes **content**, not the incidental shape of the data. Two failure modes come from freezing too much, and both produce a test that breaks for reasons that have nothing to do with the code.
+
+**Do not freeze an order that nothing guarantees.** If a collection comes back in an order the code never promises — no explicit sort key in the query, or a view whose plan is free to change — that order is an artifact of storage layout and query planning, not behavior. It flips after any write to the underlying tables, a reindex, or a different execution plan, and it can flip *because another test wrote a row and rolled back*. Freeze such a collection sorted by a key that is stable and unique, and leave collections whose order *is* guaranteed exactly as they arrive. When adding a test, run the **whole suite**, not only your own file: the order in which tests execute changes the state the others observe, and a fragile snapshot usually passes alone and breaks in the suite.
+
+**Do not freeze identifiers the environment assigns.** When the code resolves something by a human-meaningful name — an entity, a role, a group, a type — freeze the **name**, not the surrogate key the store handed out. A surrogate key belongs to the row, not to the behavior: it changes when the row is recreated and it differs between environments, so freezing it binds the test to data instead of to code. This applies to keys the code persists as references too — resolve them back to the natural key before comparing. Identifiers *created inside the test* (in the same transaction) are different: they are an effect of the code, so they can be frozen. When the test has to borrow rows that already exist, verify their presence and state before freezing them, and record in the test what is genuinely borrowed from the live environment.
+
+The rule of thumb: **the snapshot must contain only what the code decided.** Everything the environment decides — the current time, a random draw, the physical layout of a table, the numeric id of a pre-existing row — is either normalized away or replaced by the stable identity the code actually used.
 
 ## "I can refactor now" criterion (Trust Verification)
 
-Do not look at the line coverage metric. Apply **manual Mutation Testing** to audit your own test:
+Do not use the line coverage metric as your criterion of readiness. Apply **manual Mutation Testing** to audit your own test:
 1. Once your characterization test passes green, go into the real legacy code.
 2. Change a `+` to a `-`, a `>` to a `<`, or comment out a critical assignment.
-3. Run the test. If it still passes green, **your seam is in the wrong place or you have a false positive**.
+3. Run the test. If it still passes green, **the test is not verifying that behavior** — see "Executed is not verified" below for what that can mean.
 4. Undo the mutation immediately.
 
 You are ready to refactor only when any deliberate mutation in the impact area breaks the test.
+
+### Executed is not verified
+
+A line that runs is not a line that is verified. Line coverage says which lines were *executed*; mutation says which *behaviors* are frozen. When a mutation leaves the test green, the test is not looking at what that line produces.
+
+- **Capture the effect, not the arrival.** A test that only asserts "the flow reached the end" cannot see a change to the value the line produced. Assert the observable effect of that line — the state it writes, the query it builds, the payload it returns — not the fact of having passed through it.
+- **Ask *which* path detected it.** When one line is shared by several paths, a mutation may break only some of them. "Some test failed" is not enough: if one path does not fail, that path is not asserting what you thought it was. Fix it so every path that should observe the line observes it.
+- **A green mutation has three possible causes,** not two:
+  1. the seam is in the wrong place (the test cannot influence that code),
+  2. the test is a false positive (it asserts something that never varied), or
+  3. **the code is unreachable** — no input reaches that line, so no test can observe it. This is a property of the code, not a defect of the test.
+  Before settling on (1) or (2), try to *prove* (3): enumerate the input space that can reach the line, or reason about the predicates that guard it. If it is genuinely unreachable, document it as dead code and leave it untested — a test for unreachable code can only be made to pass by inventing an input no caller can produce.
+- **Report both directions.** The report must list the mutations that broke the test *and* the ones that did not, with the reason for each undetected one. A report listing only detected mutations cannot tell "the net is solid" apart from "the net was never tested in that direction".
+
+### After the mutations: use coverage as a map, not as a metric
+
+Mutation testing tells you whether the behaviors you *thought to check* are really frozen. It cannot tell you which behaviors you never thought of. That is what the coverage report is for — and it is why it comes *after* the mutations, not instead of them: coverage is a **map of where you never went**, mutation is the proof that where you did go, the net holds.
+
+When the environment allows it (coverage instrumentation installed, run affordable), re-run the tests with coverage and read the report as a list of **unvisited decision paths**, not as a percentage to maximize.
+
+- **Scope it.** Measure the code under characterization, and separately the collaborators it delegates to: the first shows what this test contributes, the second what it merely inherits from other tests.
+- **Turn every uncovered line into a question.** Is this a path a caller can actually reach, and does reaching it produce a *meaningfully different* outcome? If yes, that is a scenario the golden master is missing: write it, freeze it, and then mutate that new path to confirm the new scenario really detects it.
+- **Separate reachable from unreachable before writing anything.** The report cannot tell them apart. Prove reachability — enumerate the input space that reaches the line, or reason about the predicates that guard it. Unreachable code is documented as dead, not tested with an invented input.
+- **Do not chase the percentage.** A covered line is not a frozen behavior (see "Executed is not verified"), and full line coverage does not mean the characterization is complete: a file can execute every line and still miss an input that yields a different outcome. Enumerate decision paths, not lines.
+- **If instrumentation is unavailable or too slow, do it by hand.** The goal — finding the paths nobody looked at — does not depend on the tool: read the code and list the decision paths (branches, short-circuits, distinct input values that take the same route) and check each one against your scenarios.
+
+A characterization is finished when the uncovered paths have all been either exercised and frozen, or proven unreachable and documented — not when the coverage number is high.
 
 ## What NEVER to do, in this phase
 
@@ -94,9 +132,10 @@ You are ready to refactor only when any deliberate mutation in the impact area b
 
 When finishing the safety net setup, always deliver:
 1. Which seam type was used for each touched point and the justification per the decision tree.
-2. Results of the manual Mutation Testing (which line you mutated to verify the test).
+2. Results of the manual Mutation Testing: **which mutations broke the test and which did not**, with the reason for each undetected one (unreachable code, or a path that does not assert that effect).
 3. Documented bugs discovered.
 4. Snapshot files (Approval Testing) generated.
+5. The uncovered paths the coverage pass surfaced, and for each one what was done: exercised and frozen, or proven unreachable and documented as dead code.
 
 ## Note about stack-specific skills
 
